@@ -2,1156 +2,663 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="Ricettario di Panificazione — Pane, Lievitati, Pizza, Focaccia">
-<title>Panificazione · Ricettario</title>
+<title>Ricettario — Cucina Professionale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cormorant+SC:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cormorant+SC:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth}
-
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#F5F0E6;color:#1A1410;min-height:100vh;overflow-x:hidden}
 :root{
-  /* ── Palette Panificazione Artigianale ── */
-
-  /* Inchiostro – toni profondi della crosta scura */
-  --ink:#1A1410;--ink2:#2A2018;--ink3:#3B2E22;
-
-  /* Ambra – il colore del miele e della crosta dorata */
+  --ink:#1A1410;--ink2:#2A2018;
   --gold:#8B5E1A;--gold2:#A8722A;--gold3:#C4893A;
-  --gold-glow:rgba(139,94,26,.11);--gold-rim:rgba(139,94,26,.20);
-
-  /* Terra cotta – argilla del forno a legna */
-  --terra:#8C4A2F;--terra-bg:rgba(140,74,47,.08);--terra-border:rgba(140,74,47,.20);
-
-  /* Farina – bianchi e panna naturali, non abbaglianti */
-  --cream:#F5F0E6;--cream2:#EDE5D4;--cream3:#E0D5C0;--cream4:#CFC3A8;
-
-  /* Cenere – grigi caldi della semola */
+  --gold-glow:rgba(139,94,26,.12);--gold-rim:rgba(139,94,26,.22);
+  --cream:#F5F0E6;--cream2:#EDE5D4;--cream3:#E0D5C0;
   --smoke:#6E6050;--smoke2:#9A8A78;--smoke3:#C2B49E;
-
-  --white:#FAF6EE;
-  --card-bg:#FDFAF3;
-
-  /* Controlli – lino grezzo */
-  --ctrl-bg:#EAE0CB;--ctrl-border:rgba(139,94,26,.22);
-
-  --shadow-xs:0 1px 3px rgba(26,20,16,.07);
+  --card-bg:#FDFAF3;--ctrl-bg:#EAE0CB;--ctrl-border:rgba(139,94,26,.22);
   --shadow-sm:0 2px 8px rgba(26,20,16,.09);
   --shadow-md:0 6px 22px rgba(26,20,16,.11);
-  --shadow-lg:0 14px 40px rgba(26,20,16,.15);
   --r:4px;
-  --font-display:'Cormorant Garamond',Georgia,serif;
-  --font-sc:'Cormorant SC','Cormorant Garamond',Georgia,serif;
-  --font-sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  --font-d:'Cormorant Garamond',Georgia,serif;
+  --font-sc:'Cormorant SC',Georgia,serif;
+  --font-s:'DM Sans',sans-serif;
+  --section-accent:var(--gold2);
+  --section-bg:var(--cream);
 }
-
-[data-dark]{
-  /* Notte del forno – braci e carbone */
-  --ink:#EDE5D0;--ink2:#D0C4AC;--ink3:#AFA092;
-  --cream:#140F0A;--cream2:#1C1610;--cream3:#261E16;--cream4:#2E251A;
-  --smoke:#6A5C4C;--smoke2:#443A2C;--smoke3:#2C2418;
-  --white:#1C1610;--card-bg:#1C1610;
-  --ctrl-bg:#140F0A;--ctrl-border:rgba(139,94,26,.22);
-  --shadow-xs:0 1px 3px rgba(0,0,0,.30);
-  --shadow-sm:0 2px 8px rgba(0,0,0,.36);
-  --shadow-md:0 6px 22px rgba(0,0,0,.48);
-  --shadow-lg:0 14px 40px rgba(0,0,0,.60);
-}
-
-/* ─── Grain texture overlay ─── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity:.025;mix-blend-mode:multiply;
-}
-[data-dark] body::before{mix-blend-mode:screen;opacity:.04}
-
-body{
-  background:var(--cream);
-  color:var(--ink);
-  font-family:var(--font-display);
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  padding-bottom:env(safe-area-inset-bottom);
-}
-
-/* ─── HEADER ─── */
-.hd{
-  text-align:center;
-  padding:clamp(2rem,6vw,3.5rem) 1.4rem 0;
-  background:linear-gradient(180deg,var(--cream) 0%,var(--cream2) 100%);
-  border-bottom:1px solid var(--ctrl-border);
-  position:relative;overflow:hidden;
-}
-/* subtle top border stripes */
-.hd::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,transparent,var(--gold),var(--gold3),var(--gold),transparent);
-}
-
-.hd-corner{position:absolute;top:1.2rem;right:1.2rem;z-index:2}
-.theme-btn{
-  background:var(--ctrl-bg);border:1px solid var(--ctrl-border);
-  border-radius:20px;padding:.3rem .7rem;cursor:pointer;
-  font-family:var(--font-sans);font-size:.6rem;letter-spacing:.1em;
-  color:var(--smoke2);display:inline-flex;align-items:center;gap:.3rem;
-  -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s;
-}
-.theme-btn:hover{background:var(--gold-glow)}
-
-/* wheat icon */
-.hd-icon{
-  margin:0 auto .8rem;
-  width:clamp(64px,14vw,96px);height:clamp(64px,14vw,96px);
-  border-radius:50%;
-  background:var(--white);
-  border:1.5px solid var(--gold2);
-  box-shadow:0 0 0 4px var(--gold-glow),var(--shadow-md);
-  display:flex;align-items:center;justify-content:center;
-}
-.hd-icon svg{width:52%;height:52%}
-
-.eyebrow{
-  font-family:var(--font-sans);
-  font-size:.56rem;letter-spacing:.36em;text-transform:uppercase;
-  color:var(--gold2);
-  display:flex;align-items:center;justify-content:center;gap:.6rem;
-  margin-bottom:.4rem;
-}
-.eyebrow::before,.eyebrow::after{
-  content:'';width:28px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold2));
-}
-.eyebrow::after{background:linear-gradient(270deg,transparent,var(--gold2))}
-
-.hd-title{
-  font-family:var(--font-sc);
-  font-size:clamp(2.4rem,9vw,4.2rem);
-  font-weight:300;letter-spacing:.1em;
-  color:var(--ink);line-height:1;
-  margin:.3rem 0 .2rem;
-}
-.hd-title em{
-  font-style:italic;font-family:var(--font-display);
-  color:var(--gold2);letter-spacing:.06em;
-}
-
-.hd-author{
-  font-family:var(--font-display);
-  font-size:clamp(.9rem,3vw,1.15rem);
-  font-weight:300;font-style:italic;
-  color:var(--smoke2);margin:.35rem 0 0;letter-spacing:.04em;
-}
-.hd-sub{
-  font-family:var(--font-sans);
-  font-size:.56rem;letter-spacing:.2em;
-  color:var(--smoke3);margin:.6rem 0 0;text-transform:uppercase;
-}
-.hd-rule{
-  display:flex;align-items:center;gap:.55rem;
-  margin:1.1rem 0 0;opacity:.5;
-}
-.hd-rule::before,.hd-rule::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold));
-}
-.hd-rule::after{background:linear-gradient(270deg,transparent,var(--gold))}
-.hd-rule span{color:var(--gold);font-size:.44rem;letter-spacing:.3em}
-
-/* ─── STICKY CONTROLS ─── */
-.ctrl-shell{
-  position:-webkit-sticky;position:sticky;top:0;z-index:40;
-  background:var(--cream2);
-  border-bottom:1px solid var(--ctrl-border);
-  box-shadow:0 2px 14px rgba(28,23,18,.08);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-}
-.ctrl-row{
-  max-width:1360px;margin:0 auto;
-  padding:.7rem 1.2rem;
-  display:flex;gap:.65rem;align-items:center;flex-wrap:nowrap;
-}
-.search-wrap{flex:1;min-width:0;position:relative}
-.search-ico{
-  position:absolute;left:.78rem;top:50%;transform:translateY(-50%);
-  color:var(--gold);pointer-events:none;width:14px;height:14px;
-}
-.search-inp{
-  width:100%;background:var(--white);
-  border:1.5px solid var(--ctrl-border);border-radius:var(--r);
-  padding:.55rem .8rem .55rem 2.3rem;
-  font-family:var(--font-display);font-size:.95rem;
-  color:var(--ink);outline:none;
-  -webkit-appearance:none;appearance:none;-webkit-border-radius:var(--r);
-  transition:border-color .18s,box-shadow .18s;
-}
-.search-inp::placeholder{color:var(--smoke3);font-style:italic}
-.search-inp:focus{border-color:var(--gold2);box-shadow:0 0 0 3px var(--gold-glow)}
-
-.dose-box{
-  display:flex;align-items:stretch;
-  border:1.5px solid var(--ctrl-border);border-radius:var(--r);
-  background:var(--white);overflow:hidden;flex-shrink:0;
-}
-.dose-lbl{
-  padding:0 .58rem;font-family:var(--font-sans);
-  font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--gold);border-right:1px solid var(--ctrl-border);
-  display:flex;align-items:center;white-space:nowrap;background:var(--ctrl-bg);
-}
-.dose-btn{
-  background:none;border:none;color:var(--smoke2);
-  width:32px;min-height:36px;cursor:pointer;font-size:1rem;
-  display:flex;align-items:center;justify-content:center;
-  -webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;
-}
-.dose-btn:active{background:var(--gold2);color:#fff}
-.dose-val{
-  background:none;border:none;color:var(--ink);
-  font-family:var(--font-display);font-size:1rem;
-  width:2.8rem;text-align:center;outline:none;
-  border-left:1px solid var(--ctrl-border);border-right:1px solid var(--ctrl-border);
-}
-.dose-val::-webkit-inner-spin-button,.dose-val::-webkit-outer-spin-button{-webkit-appearance:none}
-
-.view-btns{
-  display:flex;border:1.5px solid var(--ctrl-border);
-  border-radius:var(--r);overflow:hidden;flex-shrink:0;
-}
-.vbtn{
-  background:var(--white);border:none;padding:.45rem .58rem;
-  cursor:pointer;color:var(--smoke2);display:flex;align-items:center;
-  -webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;
-}
-.vbtn+.vbtn{border-left:1px solid var(--ctrl-border)}
-.vbtn.on{background:var(--gold2);color:#fff}
-
-.cat-bar{
-  max-width:1360px;margin:0 auto;padding:.45rem 1.2rem;
-  display:flex;gap:.35rem;flex-wrap:nowrap;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-}
+/* LANDING */
+#landing{min-height:100vh;display:flex;flex-direction:column;background:var(--cream)}
+.land-top{text-align:center;padding:3rem 1.5rem 2rem;position:relative}
+.land-logo-wrap{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;border:1.5px solid var(--gold-rim);background:var(--card-bg);margin-bottom:1.2rem;box-shadow:0 2px 12px var(--gold-glow)}
+.land-eyebrow{font-family:var(--font-sc);font-size:.65rem;letter-spacing:.22em;color:var(--smoke2);text-transform:uppercase;margin-bottom:.5rem}
+.land-headline{font-family:var(--font-d);font-size:clamp(2rem,7vw,3rem);font-weight:300;letter-spacing:.04em;color:var(--ink);line-height:1.05}
+.land-headline em{font-style:italic;color:var(--gold2)}
+.land-rule{display:flex;align-items:center;gap:.8rem;margin:1.4rem auto 0;max-width:240px}
+.land-rule::before,.land-rule::after{content:'';flex:1;height:1px;background:var(--gold-rim)}
+.land-rule span{color:var(--gold3);font-size:.55rem;letter-spacing:.3em}
+.land-cards{flex:1;display:flex;flex-direction:column;gap:0}
+@media(min-width:780px){.land-cards{flex-direction:row}}
+.land-card{flex:1;position:relative;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;min-height:28vh;transition:flex .4s cubic-bezier(.23,1,.32,1);-webkit-tap-highlight-color:transparent}
+@media(min-width:780px){.land-card{min-height:56vh}.land-card:hover{flex:1.5}}
+.land-card-bg{position:absolute;inset:0;transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.land-card:hover .land-card-bg,.land-card:active .land-card-bg{transform:scale(1.03)}
+.land-card[data-s="panificazione"] .land-card-bg{background:linear-gradient(160deg,#2A1F13 0%,#4A3420 50%,#6B4A28 100%)}
+.land-card[data-s="fine-dining"] .land-card-bg{background:linear-gradient(160deg,#080808 0%,#111111 50%,#1A1610 100%)}
+.land-card[data-s="colazioni"] .land-card-bg{background:linear-gradient(160deg,#8C4A2F 0%,#A8632A 50%,#C4893A 100%)}
+.land-card-texture{position:absolute;inset:0;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23fff'/%3E%3C/svg%3E");background-size:4px 4px}
+.land-card-content{position:relative;z-index:2;padding:2.2rem 2rem}
+.land-card-num{font-family:var(--font-sc);font-size:.58rem;letter-spacing:.28em;color:rgba(255,255,255,.35);margin-bottom:1rem;text-transform:uppercase}
+.land-card-icon{width:44px;height:44px;margin-bottom:1rem;opacity:.85}
+.land-card-title{font-family:var(--font-d);font-size:clamp(1.4rem,4vw,2rem);font-weight:300;letter-spacing:.05em;color:#fff;line-height:1.05;margin-bottom:.5rem}
+.land-card-title em{font-style:italic;font-weight:300}
+.land-card-sub{font-family:var(--font-s);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.land-card-arrow{position:absolute;right:1.8rem;bottom:2rem;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;transition:transform .25s,background .25s}
+.land-card:hover .land-card-arrow,.land-card:active .land-card-arrow{transform:translateX(4px);background:rgba(255,255,255,.12)}
+.config-btn{position:absolute;top:1.2rem;right:1.5rem;background:none;border:1px solid var(--ctrl-border);color:var(--smoke);border-radius:20px;padding:.32rem .75rem;font-size:.62rem;letter-spacing:.1em;font-family:var(--font-s);cursor:pointer;display:flex;align-items:center;gap:.4rem;-webkit-tap-highlight-color:transparent;transition:border-color .2s,color .2s}
+.config-btn:hover{border-color:var(--gold2);color:var(--gold2)}
+.fb-status{width:7px;height:7px;border-radius:50%;display:inline-block;background:#bbb;transition:background .4s}
+.fb-status.ok{background:#5cb85c}.fb-status.err{background:#d9534f}
+.fb-status.loading{background:#f0ad4e;animation:pulse .9s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column}
+#app.visible{display:flex}
+.app-hd{padding:env(safe-area-inset-top,0) 0 0;background:var(--section-bg);position:sticky;top:0;z-index:40;border-bottom:1px solid var(--ctrl-border)}
+.app-hd-inner{padding:1rem 1.2rem .7rem;display:flex;align-items:center;gap:.8rem}
+.back-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:.35rem;font-family:var(--font-s);font-size:.7rem;letter-spacing:.08em;color:var(--smoke);padding:.3rem 0;-webkit-tap-highlight-color:transparent;transition:color .2s;white-space:nowrap}
+.back-btn:hover{color:var(--section-accent)}
+.app-hd-title{flex:1;min-width:0}
+.app-hd-title h1{font-family:var(--font-d);font-size:clamp(1.2rem,4vw,1.6rem);font-weight:300;letter-spacing:.04em;color:var(--ink);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-hd-title p{font-family:var(--font-s);font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--smoke2)}
+.theme-btn{background:none;border:1px solid var(--ctrl-border);border-radius:20px;padding:.28rem .6rem;font-size:.62rem;color:var(--smoke);display:flex;align-items:center;gap:.3rem;cursor:pointer;font-family:var(--font-s);-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.ctrl-shell{background:var(--section-bg);border-bottom:1px solid var(--ctrl-border)}
+.ctrl-row{display:flex;align-items:center;gap:.6rem;padding:.6rem 1.2rem;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:160px;display:flex;align-items:center;background:var(--ctrl-bg);border:1px solid var(--ctrl-border);border-radius:var(--r);padding:.4rem .75rem;gap:.5rem}
+.search-ico{width:13px;height:13px;color:var(--smoke2);flex-shrink:0}
+.search-inp{flex:1;background:none;border:none;outline:none;font-family:var(--font-s);font-size:.82rem;color:var(--ink)}
+.search-inp::placeholder{color:var(--smoke3)}
+.dose-box{display:flex;align-items:center;gap:.3rem}
+.dose-lbl{font-size:.6rem;letter-spacing:.1em;color:var(--smoke2);text-transform:uppercase;white-space:nowrap}
+.dose-btn{width:28px;height:28px;border-radius:var(--r);border:1px solid var(--ctrl-border);background:var(--ctrl-bg);color:var(--ink);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.dose-val{width:38px;height:28px;text-align:center;border:1px solid var(--ctrl-border);background:var(--ctrl-bg);border-radius:var(--r);color:var(--ink);font-family:var(--font-s);font-size:.82rem;outline:none}
+.view-btns{display:flex;gap:.25rem}
+.vbtn{width:30px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ctrl-border);background:var(--ctrl-bg);border-radius:var(--r);cursor:pointer;color:var(--smoke2);-webkit-tap-highlight-color:transparent;transition:all .15s}
+.vbtn.on{background:var(--section-accent);border-color:var(--section-accent);color:#fff}
+.cat-bar{display:flex;gap:.4rem;overflow-x:auto;padding:.45rem 1.2rem;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .cat-bar::-webkit-scrollbar{display:none}
-.cpill{
-  background:var(--white);border:1px solid var(--ctrl-border);
-  border-radius:20px;padding:.26rem .76rem;
-  font-family:var(--font-sans);font-size:.66rem;letter-spacing:.08em;
-  color:var(--smoke);cursor:pointer;white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
-  transition:background .15s,color .15s,border-color .15s;
-}
-.cpill.on{background:var(--gold2);border-color:var(--gold2);color:#fff}
-
-/* ─── GRID ─── */
-.count-bar{
-  max-width:1360px;margin:0 auto;
-  padding:.4rem 1.3rem 0;text-align:right;
-  font-family:var(--font-sans);font-size:.58rem;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--smoke3);
-}
-.grid{
-  max-width:1360px;margin:0 auto;
-  padding:1.6rem 1.2rem 6rem;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(308px,1fr));
-  gap:1.5rem;
-  align-items:start;
-}
+.cpill{white-space:nowrap;border:1px solid var(--ctrl-border);background:var(--ctrl-bg);border-radius:20px;padding:.25rem .75rem;font-family:var(--font-s);font-size:.65rem;letter-spacing:.06em;color:var(--smoke);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;flex-shrink:0}
+.cpill.on{background:var(--section-accent);border-color:var(--section-accent);color:#fff}
+.count-bar{padding:.3rem 1.2rem;font-family:var(--font-s);font-size:.62rem;letter-spacing:.08em;color:var(--smoke2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;padding:1.2rem 1.2rem 6rem}
 .grid.list{grid-template-columns:1fr}
-
-/* ─── CARD ─── */
-.card{
-  background:var(--card-bg);
-  border:1px solid var(--ctrl-border);
-  border-radius:6px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  box-shadow:var(--shadow-sm);
-  transition:box-shadow .25s,transform .25s;
-  animation:fadeUp .4s ease both;
-}
-.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.card:nth-child(1){animation-delay:.04s}
-.card:nth-child(2){animation-delay:.08s}
-.card:nth-child(3){animation-delay:.12s}
-.card:nth-child(4){animation-delay:.16s}
-.card:nth-child(5){animation-delay:.20s}
-.card:nth-child(6){animation-delay:.24s}
-.card:nth-child(7){animation-delay:.28s}
-.card:nth-child(8){animation-delay:.32s}
-.card:nth-child(9){animation-delay:.36s}
-.card:nth-child(10){animation-delay:.40s}
-.card:nth-child(11){animation-delay:.44s}
-.card:nth-child(12){animation-delay:.48s}
-
-/* gold top stripe */
-.card-stripe{
-  height:2.5px;
-  background:linear-gradient(90deg,var(--gold),var(--gold3),var(--gold),var(--gold3),var(--gold));
-  flex-shrink:0;
-}
-
-/* card header */
-.card-hd{
-  background:var(--ink3);
-  padding:.9rem 1.1rem .8rem;
-  border-bottom:1px solid var(--gold);
-  position:relative;
-}
-.card-meta{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:.28rem;
-}
-.card-num{
-  font-family:var(--font-sans);font-size:.48rem;
-  letter-spacing:.3em;text-transform:uppercase;color:rgba(139,94,26,.7);
-}
-.card-cat{
-  font-family:var(--font-sans);font-size:.5rem;
-  letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(139,94,26,.55);
-  border:1px solid rgba(139,94,26,.25);
-  border-radius:2px;padding:.1rem .45rem;
-}
-.card-name{
-  font-family:var(--font-display);
-  font-size:1.05rem;font-weight:400;font-style:italic;
-  color:#F0E8D6;letter-spacing:.01em;line-height:1.3;
-}
-.card-name-star{color:var(--gold2)}
-/* subtle line under name */
-.card-hd::after{
-  content:'';position:absolute;bottom:0;left:1.1rem;right:1.1rem;height:1px;
-  background:linear-gradient(90deg,var(--gold),transparent);
-  opacity:.4;
-}
-
-/* ─── INGREDIENTS TABLE ─── */
-.tbl{width:100%;border-collapse:collapse}
-.tbl thead tr{background:var(--cream3)}
-.tbl thead th{
-  font-family:var(--font-sans);font-size:.48rem;
-  letter-spacing:.16em;text-transform:uppercase;font-weight:500;
-  color:var(--smoke);padding:.42rem .85rem;
-  text-align:left;border-bottom:1px solid var(--ctrl-border);
-}
-.tbl thead th.r{text-align:right}
-.tbl thead th.sc{
-  text-align:right;color:var(--gold2);
-  background:rgba(139,94,26,.07);
-  border-left:1px solid rgba(139,94,26,.16);
-}
-.tbl tbody tr{border-bottom:1px solid rgba(139,94,26,.07)}
+/* CARD */
+.card{background:var(--card-bg);border-radius:8px;border:1px solid var(--gold-rim);box-shadow:var(--shadow-sm);overflow:hidden;animation:fadeUp .35s ease both;position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card-stripe{height:3px;background:linear-gradient(90deg,var(--section-accent),var(--gold3))}
+.card-hd{padding:.9rem 1rem .55rem;position:relative}
+.card-meta{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
+.card-num{font-family:var(--font-sc);font-size:.55rem;letter-spacing:.18em;color:var(--smoke3)}
+.card-cat{font-family:var(--font-s);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--section-accent);background:var(--gold-glow);border:1px solid var(--gold-rim);border-radius:20px;padding:.15rem .55rem}
+.card-name{font-family:var(--font-d);font-size:1.15rem;font-weight:400;font-style:italic;color:var(--ink);letter-spacing:.02em;padding-right:64px}
+.card-actions{position:absolute;top:.75rem;right:.75rem;display:flex;gap:.3rem}
+.card-action-btn{width:28px;height:28px;border-radius:var(--r);border:1px solid var(--ctrl-border);background:var(--ctrl-bg);color:var(--smoke2);cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.card-action-btn:hover{background:var(--gold-glow);border-color:var(--gold-rim);color:var(--gold2)}
+.card-action-btn.del:hover{background:rgba(200,60,40,.08);border-color:rgba(200,60,40,.3);color:#c8483c}
+.tbl{width:100%;border-collapse:collapse;font-family:var(--font-s);font-size:.76rem}
+.tbl thead th{font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke3);padding:.3rem 1rem .25rem;border-bottom:1px solid var(--cream3);font-weight:400;text-align:left}
+.tbl thead th.r,.tbl thead th.sc{text-align:right}
+.tbl tbody tr{border-bottom:1px solid var(--cream3)}
 .tbl tbody tr:last-child{border-bottom:none}
-.tbl tbody tr:nth-child(even){background:rgba(139,94,26,.025)}
-.tbl td{padding:.38rem .85rem;vertical-align:middle}
-.td-n{font-family:var(--font-display);font-size:.88rem;color:var(--ink)}
-.td-b{font-family:var(--font-display);font-size:.82rem;text-align:right;color:var(--smoke2)}
-.td-u{font-family:var(--font-sans);font-size:.62rem;color:var(--smoke3);padding-left:.15rem;font-style:italic}
-.td-s{
-  font-family:var(--font-display);font-size:.9rem;font-style:italic;
-  text-align:right;color:var(--gold2);
-  background:rgba(139,94,26,.05);
-  border-left:1px solid rgba(139,94,26,.12);
-  padding-right:.9rem;
-}
-/* section divider row */
-.tr-sec td{
-  font-family:var(--font-sans);font-size:.5rem;
-  letter-spacing:.2em;text-transform:uppercase;
-  color:var(--terra);background:var(--terra-bg);
-  padding:.28rem .85rem;
-  border-top:1px solid var(--terra-border);
-  font-weight:600;
-}
-
-/* ─── SECTION LABEL ─── */
-.sec-label{
-  font-family:var(--font-sans);
-  font-size:.48rem;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:.42rem;
-  display:flex;align-items:center;gap:.42rem;
-}
-.sec-label::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,rgba(139,94,26,.28),transparent);
-}
-
-/* ─── PROCESSO ─── */
-.proc-sec{
-  padding:.7rem 1.1rem .6rem;
-  border-top:1px solid var(--ctrl-border);
-}
-.proc-list{list-style:none;display:flex;flex-direction:column;gap:.25rem}
-.proc-item{
-  display:flex;align-items:baseline;gap:.5rem;
-  font-family:var(--font-display);font-size:.82rem;
-  color:var(--ink2);line-height:1.45;
-}
-.proc-n{
-  font-family:var(--font-sans);font-size:.46rem;font-weight:700;
-  color:var(--gold2);min-width:1rem;flex-shrink:0;margin-top:.06rem;
-  letter-spacing:.05em;
-}
-
-/* ─── COTTURA ─── */
-.cott-sec{
-  padding:.6rem 1.1rem .65rem;
-  border-top:1px solid var(--ctrl-border);
-}
-.cott-list{display:flex;flex-direction:column;gap:.28rem;margin-top:.38rem}
-.cott-chip{
-  display:flex;align-items:center;gap:.5rem;
-  background:rgba(139,94,26,.06);
-  border:1px solid rgba(139,94,26,.18);
-  border-radius:3px;
-  padding:.3rem .7rem;
-  font-family:var(--font-sans);font-size:.7rem;
-  color:var(--gold2);letter-spacing:.02em;
-}
-.cott-arrow{
-  width:10px;height:10px;flex-shrink:0;opacity:.7;
-  color:var(--gold3);
-}
-
-/* ─── TARGET/PRODUZIONE ─── */
-.target-bar{
-  padding:.38rem 1.1rem;
-  border-top:1px solid var(--ctrl-border);
-  background:rgba(139,94,26,.04);
-  font-family:var(--font-sans);font-size:.64rem;
-  letter-spacing:.06em;color:var(--smoke2);
-  display:flex;align-items:center;gap:.42rem;
-  line-height:1.4;
-}
-.target-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--gold2);flex-shrink:0;
-}
-
-/* ─── EMPTY STATE ─── */
-.empty{
-  grid-column:1/-1;text-align:center;
-  padding:5rem 2rem;color:var(--smoke2);
-}
-.empty-ico{
-  font-size:2.2rem;opacity:.2;margin-bottom:.8rem;
-  font-family:var(--font-display);
-}
-.empty p{font-family:var(--font-sans);font-size:.88rem;font-style:italic}
-
-/* ─── FAB ─── */
-.fab{
-  position:fixed;
-  bottom:calc(1.6rem + env(safe-area-inset-bottom));
-  right:1.6rem;
-  width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  border:none;cursor:pointer;
-  font-size:1.45rem;color:#fff;z-index:60;
-  box-shadow:0 4px 20px rgba(139,94,26,.42);
-  display:flex;align-items:center;justify-content:center;
-  -webkit-tap-highlight-color:transparent;
-  transition:transform .15s,box-shadow .15s;
-}
-.fab:active{transform:scale(.92);box-shadow:0 2px 10px rgba(139,94,26,.3)}
-
-/* ─── MODAL ─── */
-.modal-bg{
-  display:none;position:fixed;inset:0;
-  background:rgba(8,6,3,.78);
-  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
-  z-index:80;align-items:flex-end;justify-content:center;
-}
+.tbl tbody td{padding:.35rem 1rem;color:var(--ink2);vertical-align:top}
+.td-b,.td-s{text-align:right;white-space:nowrap;color:var(--smoke)}
+.td-s{color:var(--section-accent);font-weight:500}
+.tr-sec td{font-family:var(--font-sc);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--section-accent);background:var(--gold-glow);padding:.28rem 1rem}
+.proc-sec,.cott-sec{padding:.65rem 1rem .5rem;border-top:1px solid var(--cream3)}
+.sec-label{font-family:var(--font-sc);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--smoke3);margin-bottom:.4rem}
+.proc-list{list-style:none;display:flex;flex-direction:column;gap:.3rem}
+.proc-item{font-family:var(--font-s);font-size:.75rem;color:var(--ink2);display:flex;gap:.5rem}
+.proc-n{color:var(--smoke3);font-size:.65rem;min-width:1.1rem;margin-top:.05rem}
+.cott-list{display:flex;flex-direction:column;gap:.3rem}
+.cott-chip{display:flex;align-items:flex-start;gap:.4rem;background:var(--cream2);border-radius:var(--r);padding:.3rem .65rem;font-family:var(--font-s);font-size:.73rem;color:var(--ink2)}
+.cott-arrow{width:10px;height:10px;flex-shrink:0;margin-top:.12rem;color:var(--section-accent)}
+.target-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem .65rem;font-family:var(--font-s);font-size:.72rem;color:var(--smoke);border-top:1px solid var(--cream3)}
+.target-dot{width:5px;height:5px;border-radius:50%;background:var(--section-accent);flex-shrink:0}
+.fab{position:fixed;right:1.4rem;bottom:calc(1.4rem + env(safe-area-inset-bottom,0));width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold3));color:#fff;font-size:1.6rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(139,94,26,.45);z-index:50;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.empty-ico{font-size:2.5rem;opacity:.25}
+.empty p{font-family:var(--font-d);font-style:italic;color:var(--smoke2)}
+.spinner-wrap{grid-column:1/-1;display:flex;justify-content:center;align-items:center;min-height:200px}
+.spinner{width:32px;height:32px;border:2px solid var(--ctrl-border);border-top-color:var(--section-accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(8,6,3,.78);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);z-index:80;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{
-  background:var(--card-bg);
-  border-radius:14px 14px 0 0;
-  padding:1.3rem 1.4rem calc(1.8rem + env(safe-area-inset-bottom));
-  width:100%;max-width:580px;
-  max-height:90vh;overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.modal-handle{
-  width:34px;height:3px;border-radius:2px;
-  background:var(--smoke3);margin:0 auto 1.1rem;
-}
-.modal h3{
-  font-family:var(--font-display);
-  color:var(--gold2);font-size:1.2rem;font-weight:400;
-  font-style:italic;margin-bottom:1rem;
-}
-.modal label{
-  display:block;font-family:var(--font-sans);
-  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--smoke);margin:.85rem 0 .26rem;
-}
-.modal input,.modal select{
-  width:100%;background:var(--ctrl-bg);
-  border:1px solid var(--ctrl-border);border-radius:var(--r);
-  color:var(--ink);padding:.5rem .72rem;
-  font-size:.9rem;font-family:var(--font-display);
-  -webkit-appearance:none;appearance:none;outline:none;
-  -webkit-border-radius:var(--r);
-  transition:border-color .18s;
-}
-.modal input:focus,.modal select:focus{border-color:var(--gold2)}
-.modal-actions{display:flex;gap:.65rem;margin-top:1.1rem}
-.modal-actions button{
-  flex:1;padding:.6rem;border-radius:var(--r);border:none;
-  font-size:.92rem;cursor:pointer;
-  font-family:var(--font-display);
-  -webkit-tap-highlight-color:transparent;
-}
-.btn-save-m{
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#fff;font-weight:400;font-style:italic;
-}
+.modal{background:var(--card-bg);border-radius:14px 14px 0 0;padding:1.3rem 1.4rem calc(1.8rem + env(safe-area-inset-bottom));width:100%;max-width:600px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-handle{width:34px;height:3px;border-radius:2px;background:var(--smoke3);margin:0 auto 1.1rem}
+.modal h3{font-family:var(--font-d);color:var(--section-accent);font-size:1.2rem;font-weight:400;font-style:italic;margin-bottom:1rem}
+.modal label{display:block;font-family:var(--font-s);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);margin:.85rem 0 .26rem}
+.modal input,.modal select,.modal textarea{width:100%;background:var(--ctrl-bg);border:1px solid var(--ctrl-border);border-radius:var(--r);color:var(--ink);padding:.5rem .72rem;font-size:.9rem;font-family:var(--font-d);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .18s}
+.modal textarea{min-height:70px;resize:vertical;line-height:1.5}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--section-accent)}
+.modal-actions{display:flex;gap:.65rem;margin-top:1.2rem}
+.modal-actions button{flex:1;padding:.65rem;border-radius:var(--r);border:none;font-size:.92rem;cursor:pointer;font-family:var(--font-d);-webkit-tap-highlight-color:transparent}
+.btn-save-m{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-style:italic}
 .btn-cancel-m{background:var(--ctrl-bg);color:var(--ink)}
-.ing-list{margin:.45rem 0;display:flex;flex-direction:column;gap:.38rem}
+.btn-del-m{background:rgba(200,60,40,.08);color:#c8483c;border:1px solid rgba(200,60,40,.25)!important}
+.ing-list{margin:.4rem 0;display:flex;flex-direction:column;gap:.35rem}
 .ing-row{display:grid;grid-template-columns:1fr .5fr .4fr auto;gap:.28rem;align-items:center}
 .ing-row input{min-width:0}
-.ing-row .rm{
-  background:none;border:1px solid var(--ctrl-border);border-radius:var(--r);
-  color:var(--smoke3);padding:.26rem .46rem;cursor:pointer;font-size:.82rem;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .15s,color .15s;
-}
-.ing-row .rm:hover{background:rgba(140,74,47,.1);color:var(--terra);border-color:var(--terra-border)}
-.btn-add-ing{
-  width:100%;background:none;
-  border:1.5px dashed var(--ctrl-border);border-radius:var(--r);
-  padding:.48rem;color:var(--smoke3);cursor:pointer;
-  font-family:var(--font-sans);font-size:.72rem;
-  margin-top:.38rem;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .15s,color .15s;
-}
-.btn-add-ing:hover{background:var(--gold-glow);color:var(--gold)}
-
-@media(max-width:480px){
+.ing-row .rm,.step-row .rm{background:none;border:1px solid var(--ctrl-border);border-radius:var(--r);color:var(--smoke3);padding:.26rem .46rem;cursor:pointer;font-size:.82rem;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.ing-row .rm:hover,.step-row .rm:hover{background:rgba(140,74,47,.1);color:#c8483c}
+.btn-add-ing,.btn-add-step{background:none;border:1px dashed var(--ctrl-border);border-radius:var(--r);color:var(--smoke2);padding:.4rem;font-family:var(--font-s);font-size:.72rem;letter-spacing:.06em;cursor:pointer;width:100%;margin-top:.3rem;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.btn-add-ing:hover,.btn-add-step:hover{border-color:var(--section-accent);color:var(--section-accent)}
+.steps-list{display:flex;flex-direction:column;gap:.35rem}
+.step-row{display:flex;gap:.28rem;align-items:center}
+.step-row input{flex:1}
+/* FIREBASE SETUP */
+.setup-intro{font-family:var(--font-d);font-size:.95rem;color:var(--smoke);line-height:1.6;margin-bottom:1rem}
+.setup-steps{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin:.8rem 0 1.2rem}
+.setup-steps li{display:flex;gap:.6rem;font-family:var(--font-s);font-size:.78rem;color:var(--ink2);line-height:1.5}
+.setup-steps li::before{content:attr(data-n);min-width:20px;height:20px;border-radius:50%;background:var(--section-accent);color:#fff;font-size:.62rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.setup-link{color:var(--gold2);text-decoration:none;border-bottom:1px solid var(--gold-rim)}
+.setup-note{font-family:var(--font-s);font-size:.7rem;color:var(--smoke2);background:var(--cream2);border-radius:var(--r);padding:.6rem .8rem;margin-top:.8rem;line-height:1.5}
+/* DARK */
+[data-dark]{--ink:#EDE5D4;--ink2:#CFC3A8;--cream:#1A1410;--cream2:#221C16;--cream3:#2E2418;--smoke:#9A8A78;--smoke2:#7A6A58;--smoke3:#5A4A3A;--card-bg:#211912;--ctrl-bg:#2A201A;--ctrl-border:rgba(139,94,26,.28);--gold-glow:rgba(139,94,26,.15);--gold-rim:rgba(139,94,26,.28)}
+[data-dark] body,[data-dark] #landing{background:#1A1410}
+/* MOBILE */
+@media(max-width:580px){
+  .land-top{padding:2.2rem 1.2rem 1.5rem}
+  .land-card{min-height:22vh}
+  .land-card-content{padding:1.6rem 1.3rem}
+  .land-card-title{font-size:1.4rem}
+  .ctrl-row{padding:.5rem .9rem;gap:.45rem}
   .dose-lbl{display:none}
-  .hd-author{display:none}
+  .cat-bar{padding:.4rem .9rem}
+  .grid{grid-template-columns:1fr;padding:1rem .9rem 5.5rem;gap:.9rem}
+  .count-bar{padding:.3rem .9rem}
+  .app-hd-inner{padding:.8rem .9rem .5rem}
 }
 </style>
 </head>
-<body>
+<body onload="boot()">
 
-<!-- ═══ HEADER ═══ -->
-<header class="hd">
-  <div class="hd-corner">
-    <button class="theme-btn" id="tbtn" type="button">
-      <span id="ticon">🌙</span>
-      <span id="tlbl">Scuro</span>
+<!-- LANDING -->
+<div id="landing">
+  <div class="land-top">
+    <button class="config-btn" id="cfgBtn">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="11" height="11"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M3.22 12.78l1.42-1.42M11.36 4.64l1.42-1.42"/></svg>
+      Firebase <span class="fb-status" id="fbDot"></span>
     </button>
-  </div>
-
-  <!-- wheat icon -->
-  <div class="hd-icon">
-    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="32" y1="56" x2="32" y2="14" stroke="#8B5E1A" stroke-width="1.8" stroke-linecap="round"/>
-      <ellipse cx="26" cy="16" rx="3.8" ry="6.5" fill="#8B5E1A" opacity=".85" transform="rotate(-18 26 16)"/>
-      <ellipse cx="38" cy="16" rx="3.8" ry="6.5" fill="#8B5E1A" opacity=".85" transform="rotate(18 38 16)"/>
-      <ellipse cx="24" cy="25" rx="3.6" ry="6.2" fill="#A8722A" opacity=".78" transform="rotate(-15 24 25)"/>
-      <ellipse cx="40" cy="25" rx="3.6" ry="6.2" fill="#A8722A" opacity=".78" transform="rotate(15 40 25)"/>
-      <ellipse cx="23" cy="34" rx="3.4" ry="5.8" fill="#C4893A" opacity=".70" transform="rotate(-10 23 34)"/>
-      <ellipse cx="41" cy="34" rx="3.4" ry="5.8" fill="#C4893A" opacity=".70" transform="rotate(10 41 34)"/>
-      <path d="M32 56 Q27 52 22 51" stroke="#8B5E1A" stroke-width="1.3" stroke-linecap="round" opacity=".45"/>
-    </svg>
-  </div>
-
-  <div class="eyebrow">Ricettario</div>
-  <h1 class="hd-title"><em>Panificazione</em></h1>
-  <p class="hd-author">Pane · Lievitati · Pizza · Focaccia</p>
-  <p class="hd-sub">Impasti · Prefermenti · Cotture</p>
-  <div class="hd-rule"><span>✦ ✦ ✦</span></div>
-</header>
-
-<!-- ═══ STICKY CONTROLS ═══ -->
-<div class="ctrl-shell">
-  <div class="ctrl-row">
-    <div class="search-wrap">
-      <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    <div class="land-logo-wrap">
+      <svg viewBox="0 0 64 64" fill="none" width="38" height="38">
+        <path d="M20 44 Q32 14 44 44" stroke="#8B5E1A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <path d="M24 34 Q32 22 40 34" stroke="#A8722A" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <circle cx="32" cy="11" r="3" fill="#C4893A" opacity=".7"/>
       </svg>
-      <input class="search-inp" id="srch" type="search"
-        placeholder="Cerca ricetta…"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
-    <div class="dose-box">
-      <div class="dose-lbl">Dosi</div>
-      <button class="dose-btn" id="dminus" type="button">−</button>
-      <input class="dose-val" id="dval" type="number" value="1" min="0.5" step="0.5">
-      <button class="dose-btn" id="dplus" type="button">+</button>
+    <div class="land-eyebrow">Cucina Professionale</div>
+    <h1 class="land-headline"><em>Il Ricettario</em></h1>
+    <div class="land-rule"><span>✦ ✦ ✦</span></div>
+  </div>
+  <div class="land-cards">
+    <div class="land-card" data-s="panificazione">
+      <div class="land-card-bg"></div><div class="land-card-texture"></div>
+      <div class="land-card-content">
+        <div class="land-card-num">01 / 03</div>
+        <svg class="land-card-icon" viewBox="0 0 64 64" fill="none">
+          <ellipse cx="32" cy="36" rx="20" ry="12" fill="#A8722A" opacity=".35"/>
+          <path d="M12 36 Q14 22 32 20 Q50 22 52 36" stroke="#C4893A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <line x1="24" y1="28" x2="22" y2="20" stroke="#A8722A" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+          <line x1="32" y1="26" x2="32" y2="17" stroke="#A8722A" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+          <line x1="40" y1="28" x2="42" y2="20" stroke="#A8722A" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+        </svg>
+        <div class="land-card-title"><em>Panificazione</em></div>
+        <div class="land-card-sub">Pane · Pizza · Lievitati · Biga</div>
+      </div>
+      <div class="land-card-arrow">›</div>
     </div>
-    <div class="view-btns">
-      <button class="vbtn on" id="vgrid" type="button" title="Griglia">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    <div class="land-card" data-s="fine-dining">
+      <div class="land-card-bg"></div><div class="land-card-texture"></div>
+      <div class="land-card-content">
+        <div class="land-card-num">02 / 03</div>
+        <svg class="land-card-icon" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="34" r="16" stroke="#C9A84C" stroke-width="1.5" opacity=".4"/>
+          <circle cx="32" cy="34" r="11" stroke="#C9A84C" stroke-width="1" opacity=".6"/>
+          <path d="M22 18 L22 26M26 16 L26 26" stroke="#C9A84C" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+          <path d="M24 26 Q24 30 26 32 L26 50M40 16 L40 28 Q40 32 38 34 L38 50" stroke="#C9A84C" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
         </svg>
-      </button>
-      <button class="vbtn" id="vlist" type="button" title="Lista">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <line x1="3" y1="12" x2="21" y2="12"/>
-          <line x1="3" y1="18" x2="21" y2="18"/>
+        <div class="land-card-title"><em>Cucina</em> Fine Dining</div>
+        <div class="land-card-sub">Aperitivo · Antipasti · Primi · Secondi</div>
+      </div>
+      <div class="land-card-arrow">›</div>
+    </div>
+    <div class="land-card" data-s="colazioni">
+      <div class="land-card-bg"></div><div class="land-card-texture"></div>
+      <div class="land-card-content">
+        <div class="land-card-num">03 / 03</div>
+        <svg class="land-card-icon" viewBox="0 0 64 64" fill="none">
+          <path d="M20 28 Q20 44 32 44 Q44 44 44 28" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+          <line x1="20" y1="28" x2="44" y2="28" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>
+          <path d="M44 32 Q52 32 52 38 Q52 44 44 44" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".5"/>
+          <line x1="27" y1="16" x2="27" y2="22" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+          <line x1="32" y1="14" x2="32" y2="22" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+          <line x1="37" y1="16" x2="37" y2="22" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>
+          <line x1="18" y1="48" x2="46" y2="48" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".35"/>
         </svg>
-      </button>
+        <div class="land-card-title"><em>Colazioni</em></div>
+        <div class="land-card-sub">Impasti · Creme · Lievitati · Pasticcini</div>
+      </div>
+      <div class="land-card-arrow">›</div>
     </div>
   </div>
-  <div class="cat-bar" id="catbar"></div>
 </div>
 
-<div class="count-bar" id="cnt"></div>
-<div class="grid" id="grid"></div>
+<!-- APP -->
+<div id="app">
+  <header class="app-hd">
+    <div class="app-hd-inner">
+      <button class="back-btn" id="backBtn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><polyline points="10,3 4,8 10,13"/></svg>
+        Sezioni
+      </button>
+      <div class="app-hd-title">
+        <h1 id="appTitle">—</h1>
+        <p id="appSub"></p>
+      </div>
+      <button class="theme-btn" id="tbtn"><span id="ticon">🌙</span><span id="tlbl"> Scuro</span></button>
+    </div>
+  </header>
+  <div class="ctrl-shell">
+    <div class="ctrl-row">
+      <div class="search-wrap">
+        <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-inp" id="srch" type="search" placeholder="Cerca ricetta…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="dose-box">
+        <div class="dose-lbl">Dosi</div>
+        <button class="dose-btn" id="dminus" type="button">−</button>
+        <input class="dose-val" id="dval" type="number" value="1" min="0.5" step="0.5">
+        <button class="dose-btn" id="dplus" type="button">+</button>
+      </div>
+      <div class="view-btns">
+        <button class="vbtn on" id="vgrid" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="vbtn" id="vlist" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="cat-bar" id="catbar"></div>
+  </div>
+  <div class="count-bar" id="cnt"></div>
+  <div class="grid" id="grid"></div>
+  <button class="fab" id="fab" type="button">+</button>
+</div>
 
-<button class="fab" id="fab" type="button" aria-label="Aggiungi ricetta">+</button>
-
-<!-- ═══ MODAL ═══ -->
-<div class="modal-bg" id="mbg" role="dialog" aria-modal="true">
+<!-- MODAL ADD/EDIT -->
+<div class="modal-bg" id="mbg">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3>Nuova Ricetta</h3>
+    <h3 id="modalTitle">Nuova Ricetta</h3>
     <label>Nome ricetta</label>
-    <input type="text" id="mn" placeholder="Es. Ciabatta con biga"
-      autocomplete="off" autocorrect="off" autocapitalize="words">
+    <input type="text" id="mn" placeholder="Es. Ciabatta con biga" autocomplete="off" autocorrect="off" autocapitalize="words">
     <label>Categoria</label>
-    <select id="mc">
-      <option>Pane</option>
-      <option>Panini</option>
-      <option>Pizza &amp; Focaccia</option>
-      <option>Lievito Madre</option>
-      <option>Biga</option>
-      <option>Senza Glutine</option>
-      <option>Altro</option>
-    </select>
+    <select id="mc"></select>
     <label>Ingredienti</label>
     <div class="ing-list" id="ilist"></div>
     <button class="btn-add-ing" id="badd" type="button">+ Aggiungi ingrediente</button>
+    <label>Processo <span style="opacity:.45;font-weight:300">(facoltativo)</span></label>
+    <div class="steps-list" id="proclist"></div>
+    <button class="btn-add-step" id="baddProc" type="button">+ Aggiungi step processo</button>
+    <label>Cottura <span style="opacity:.45;font-weight:300">(facoltativo)</span></label>
+    <div class="steps-list" id="cottlist"></div>
+    <button class="btn-add-step" id="baddCott" type="button">+ Aggiungi step cottura</button>
+    <label>Target / Note <span style="opacity:.45;font-weight:300">(facoltativo)</span></label>
+    <input type="text" id="mq" placeholder="Es. ≥ 60 pz a sera">
     <div class="modal-actions">
       <button class="btn-cancel-m" id="bcanc" type="button">Annulla</button>
-      <button class="btn-save-m" id="bsave" type="button">Salva ricetta</button>
+      <button class="btn-del-m" id="bdel" type="button" style="display:none">Elimina</button>
+      <button class="btn-save-m" id="bsave" type="button">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FIREBASE -->
+<div class="modal-bg" id="fbmodal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Configura Firebase</h3>
+    <p class="setup-intro">Per condividere le ricette su tutti i dispositivi in tempo reale, collega un Realtime Database Firebase gratuito.</p>
+    <ol class="setup-steps">
+      <li data-n="1">Vai su <a href="https://console.firebase.google.com" target="_blank" class="setup-link">console.firebase.google.com</a> → crea un nuovo progetto.</li>
+      <li data-n="2">Menu sinistra → <strong>Realtime Database</strong> → <strong>Crea database</strong> → <em>Modalità test</em>.</li>
+      <li data-n="3">Copia l'URL del database (es. <code style="font-size:.7rem;color:var(--gold2)">https://mio-progetto-rtdb.firebaseio.com</code>).</li>
+      <li data-n="4">Incollalo qui sotto e clicca Connetti.</li>
+    </ol>
+    <label>URL Database Firebase</label>
+    <input type="url" id="fbUrlInput" placeholder="https://progetto-default-rtdb.firebaseio.com">
+    <div class="setup-note">💡 L'URL è salvato solo localmente sul tuo dispositivo. Chiunque abbia l'URL del DB può leggere e scrivere in modalità test — cambia le regole su Firebase quando vuoi proteggere i dati.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel-m" id="fbCancel" type="button">Chiudi</button>
+      <button class="btn-save-m" id="fbSave" type="button">Connetti</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════
-   DATI RICETTE
-   i  = ingredienti  [nome, qty, unità]
-        unità "§"    = riga di sezione (separatore gruppo)
-   p  = processo     [step, ...]
-   k  = cottura      [programma, ...]
-   q  = quota/target produzione
-═══════════════════════════════════════ */
-var R = [
-  /* ── PANE ── */
-  {
-    n:"Grissini", c:"Pane",
-    i:[
-      ["Farina 00",500,"g"],
-      ["Farina 0",250,"g"],
-      ["Olio di oliva",200,"g"],
-      ["Acqua",350,"g"],
-      ["Sale",20,"g"],
-      ["Lievito fresco",15,"g"]
-    ],
-    p:["Impastare non troppo","Lievitare 1–2 ore","Spezzare · riposo 30 min","Infornare"],
-    k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],
-    q:"≥ 60 pz a sera"
-  },
-  {
-    n:"Freselle", c:"Pane",
-    i:[
-      ["Farina bianca",750,"g"],
-      ["Farina integrale",250,"g"],
-      ["Sale",20,"g"],
-      ["Lievito fresco",30,"g"],
-      ["Licoli",600,"g"]
-    ]
-  },
-
-  /* ── PANINI ── */
-  {
-    n:"Bun", c:"Panini",
-    i:[
-      ["Farina 00",500,"g"],
-      ["Farina 0",500,"g"],
-      ["Latte s.l.",285,"g"],
-      ["Acqua",285,"g"],
-      ["Burro morbido",100,"g"],
-      ["Sale",25,"g"],
-      ["Zucchero",20,"g"],
-      ["Lievito fresco",30,"g"]
-    ],
-    p:["Impastare","Lievitare 1–2 ore","Spezzare 25 g × 6 · stampo a rosetta","Lievitare e infornare"],
-    q:"6 gelo + 6 freschi"
-  },
-  {
-    n:"Panini con Uvetta", c:"Panini",
-    i:[
-      ["Farina 0",350,"g"],
-      ["Caputo verde",150,"g"],
-      ["Lievito fresco",15,"g"],
-      ["Acqua",130,"g"],
-      ["Latte",150,"g"],
-      ["Burro morbido",50,"g"],
-      ["Sale",15,"g"],
-      ["Zucchero",10,"g"],
-      ["Uvetta",90,"g"]
-    ],
-    p:["Pezzatura 30 g a panino"],
-    q:"≥ 25 panini gelo"
-  },
-  {
-    n:"Panini Base", c:"Panini",
-    i:[
-      ["Farina 00",500,"g"],
-      ["Farina per gusto",100,"g"],
-      ["Acqua",300,"g"],
-      ["Lievito fresco",20,"g"],
-      ["Olio",50,"g"],
-      ["Zucchero",5,"g"],
-      ["Sale",15,"g"],
-      ["Sugna",40,"g"],
-      ["Acqua (bassinage)",50,"g"]
-    ],
-    p:["Impastare 1 ora nel lievitatore","Spezzare"],
-    q:"≥ 16 panini per gusto · 20 focaccine"
-  },
-  {
-    n:"Panini Croccanti", c:"Panini",
-    i:[
-      ["Farina",600,"g"],
-      ["Acqua",300,"g"],
-      ["Zucchero",20,"g"],
-      ["Malto",null,"q.b."],
-      ["Sugna",40,"g"],
-      ["Lievito fresco",20,"g"],
-      ["Olio",50,"g"],
-      ["Zucchero (2°)",15,"g"]
-    ],
-    k:[
-      "220° · Misto vapore · v3 · 5 min",
-      "180° · Convezione · v3 · 4 min"
-    ]
-  },
-
-  /* ── BIGA ── */
-  {
-    n:"Biga per Pane", c:"Biga",
-    i:[
-      ["— Biga —",null,"§"],
-      ["Farina",2200,"g"],
-      ["Acqua",1120,"g"],
-      ["Lievito fresco",26,"g"],
-      ["Malto",3,"g"],
-      ["— Autolisi —",null,"§"],
-      ["Farina semola",1000,"g"],
-      ["Farina bianca",500,"g"],
-      ["Acqua",1000,"g"],
-      ["— Impasto finale —",null,"§"],
-      ["Malto",5,"g"],
-      ["Sale",80,"g"],
-      ["Licoli",300,"g"],
-      ["Acqua",200,"g"]
-    ],
-    p:[
-      "Biga: 1 h a T.A. · poi 23 h in frigo",
-      "Autolisi: 1 ora",
-      "Impastare biga + autolisi + finale",
-      "Pezzi da 450 g"
-    ],
-    q:"≥ 10 baguette"
-  },
-  {
-    n:"Biga Baguette", c:"Biga",
-    i:[
-      ["— Biga —",null,"§"],
-      ["Farina",1400,"g"],
-      ["Acqua tiepida",630,"g"],
-      ["Lievito fresco",15,"g"],
-      ["— Autolisi —",null,"§"],
-      ["Farina bianca",300,"g"],
-      ["Farina semola",300,"g"],
-      ["Acqua",400,"g"],
-      ["— Impasto finale —",null,"§"],
-      ["Lievito",10,"g"],
-      ["Malto",5,"g"],
-      ["Sale",40,"g"],
-      ["Olio",80,"g"],
-      ["Licoli",300,"g"],
-      ["Acqua",360,"g"]
-    ],
-    p:[
-      "Biga: 1 h T.A. + 23 h frigo  (alt. 2 h T.A. + 22 h frigo)",
-      "Autolisi: 1 ora",
-      "Lievitare 1 ora",
-      "Spezzare 450 g · stendere piano piano a baguette"
-    ],
-    k:[
-      "240° · Misto vapore · v1 · 8 min",
-      "180° · Secco · v1 · 10 min",
-      "160° · Secco · v3 · 10 min",
-      "160° · Secco · v3 · 6 min · Valvola aperta"
-    ]
-  },
-
-  /* ── LIEVITO MADRE ── */
-  {
-    n:"Pane Licoli", c:"Lievito Madre",
-    i:[
-      ["— Idrolisi —",null,"§"],
-      ["Farina (bianca / cereali / integrale)",3000,"g"],
-      ["Acqua",2000,"g"],
-      ["— Impasto finale —",null,"§"],
-      ["Licoli",1000,"g"],
-      ["Sale",80,"g"],
-      ["Acqua fredda",250,"g"]
-    ],
-    p:[
-      "Rinfresco 1-1-1  (acqua : licoli : farina)  a max 26°",
-      "Sciogliere il licoli in acqua 26–28° · aggiungere farina · incordare",
-      "Lievitare a 1,5×  (≈ 2–2,5 h)  · frigo ≥ 12 h",
-      "Usarlo al raddoppio – se collassato, non impastare",
-      "Idrolisi 30–60 min (anche in frigo)",
-      "Aggiungere licoli e impastare",
-      "Aggiungere sale + acqua fredda",
-      "4–5 ore in lievitatore a 26°  (fino al raddoppio)",
-      "Spezzare e pirlare 15 min",
-      "Chiusura a tre + tre  ·  riposo max 1 h fuori frigo",
-      "Frigo 12–18 h",
-      "Tirare fuori 1 h prima di infornare  ·  Tagliare e spruzzare con acqua"
-    ],
-    k:[
-      "260° · Misto vapore 80% · v1 · 15 min",
-      "180° · Secco · v1 · 30 min",
-      "160° · Secco · v3 · 15 min · Valvola aperta"
-    ],
-    q:"≥ 16 pagnotte/giorno · 2 bianche · 2 integrali · Pagnotta 260–300 g · Pezzo 700 g"
-  },
-
-  /* ── PIZZA & FOCACCIA ── */
-  {
-    n:"Pizza Pala", c:"Pizza & Focaccia",
-    i:[
-      ["— Biga —",null,"§"],
-      ["Farina",1000,"g"],
-      ["Acqua",450,"g"],
-      ["Lievito fresco",10,"g"],
-      ["— Impasto finale —",null,"§"],
-      ["Malto",10,"g"],
-      ["Sale",20,"g"],
-      ["Licoli",300,"g"],
-      ["Acqua",350,"g"],
-      ["Olio",50,"g"],
-      ["Lievito",10,"g"]
-    ],
-    p:[
-      "Biga: 1 h T.A. + 23 h frigo  (alt. 2 h T.A. + 22 h frigo)",
-      "Lievitare 1–2 ore nel lievitatore",
-      "Spezzare 400 g con piega a tre · senza stringere",
-      "1 ora di lievitazione",
-      "Stendere · condire con olio, origano e sale Maldon"
-    ],
-    k:[
-      "260° · Misto vapore · v4 · placca calda · 6 min",
-      "+ 2 min · Valvola aperta"
-    ],
-    q:"≥ 10 al giorno · Pezzi da 400 g"
-  },
-  {
-    n:"Focaccia Pugliese", c:"Pizza & Focaccia",
-    i:[
-      ["— Autolisi —",null,"§"],
-      ["Farina semola",1000,"g"],
-      ["Acqua",600,"g"],
-      ["Miele / Malto",10,"g"],
-      ["— Impasto finale —",null,"§"],
-      ["Lievito fresco",30,"g"],
-      ["Acqua 26–28°",85,"g"],
-      ["Farina",85,"g"],
-      ["Sale",30,"g"],
-      ["Patate lesse",300,"g"],
-      ["Olio",40,"g"]
-    ],
-    p:[
-      "Autolisi + riposo 2 ore",
-      "1 – Autolisi + farina + lievito + \u00B9\u2044\u2083 acqua  ·  v1",
-      "2 – Sale + \u00B9\u2044\u2083 patate  ·  v2",
-      "3 – \u00B9\u2044\u2083 patate + \u00B2\u2044\u2083 acqua + olio",
-      "4 – Riposo 15 min",
-      "5 – Spezzare in stampi  ·  120–140 g",
-      "6 – Lievitare 60 min",
-      "7 – Condire + lievitare 60 min"
-    ],
-    k:["220° · 8–10 min"],
-    q:"≥ 15 pz al giorno  ·  Stampi 120–140 g"
-  },
-
-  /* ── SENZA GLUTINE ── */
-  {
-    n:"Pane Celiaci", c:"Senza Glutine",
-    i:[
-      ["Farina celiaca",1000,"g"],
-      ["Acqua",750,"g"],
-      ["Lievito fresco",30,"g"],
-      ["Sale",25,"g"],
-      ["Miele",20,"g"]
-    ],
-    p:["Impastare","Lievitare","Spezzare in quadrati","Lievitare e infornare"],
-    q:"≥ 2 buste da 20 pz gelo"
-  }
+var SECTIONS={
+  'panificazione':{label:'Panificazione',sub:'Pane · Lievitati · Pizza · Focaccia',cats:['Pane','Panini','Pizza & Focaccia','Lievito Madre','Biga','Senza Glutine','Altro'],accent:'#A8722A',dark:false},
+  'fine-dining':{label:'Cucina Fine Dining',sub:'Aperitivo · Antipasti · Primi · Secondi',cats:['Aperitivo','Antipasti','Primi','Secondi','Altro'],accent:'#C9A84C',dark:true},
+  'colazioni':{label:'Colazioni',sub:'Impasti · Creme · Lievitati · Pasticcini',cats:['Impasti','Creme','Lievitati','Marmellate','Pasticcini','Altro'],accent:'#A8622A',dark:false}
+};
+var SEED_PANI=[
+  {n:"Grissini",c:"Pane",i:[["Farina 00",500,"g"],["Farina 0",250,"g"],["Olio di oliva",200,"g"],["Acqua",350,"g"],["Sale",20,"g"],["Lievito fresco",15,"g"]],p:["Impastare non troppo","Lievitare 1–2 ore","Spezzare · riposo 30 min","Infornare"],k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],q:"≥ 60 pz a sera"},
+  {n:"Bun",c:"Panini",i:[["Farina 00",500,"g"],["Farina 0",500,"g"],["Latte s.l.",285,"g"],["Acqua",285,"g"],["Burro morbido",100,"g"],["Sale",25,"g"],["Zucchero",20,"g"],["Lievito fresco",30,"g"]],p:["Impastare","Lievitare 1–2 ore","Spezzare 25g × 6 · stampo rosetta","Lievitare e infornare"],q:"6 gelo + 6 freschi"},
+  {n:"Biga per Pane",c:"Biga",i:[["— Biga —",null,"§"],["Farina",2200,"g"],["Acqua",1120,"g"],["Lievito fresco",26,"g"],["Malto",3,"g"],["— Autolisi —",null,"§"],["Farina semola",1000,"g"],["Farina bianca",500,"g"],["Acqua",1000,"g"],["— Impasto finale —",null,"§"],["Malto",5,"g"],["Sale",80,"g"],["Licoli",300,"g"],["Acqua",200,"g"]],p:["Biga: 1h T.A. + 23h frigo","Autolisi: 1 ora","Impastare biga + autolisi + finale","Pezzi da 450g"],q:"≥ 10 baguette"},
+  {n:"Pizza Pala",c:"Pizza & Focaccia",i:[["— Biga —",null,"§"],["Farina",1000,"g"],["Acqua",450,"g"],["Lievito fresco",10,"g"],["— Impasto finale —",null,"§"],["Malto",10,"g"],["Sale",20,"g"],["Licoli",300,"g"],["Acqua",350,"g"],["Olio",50,"g"],["Lievito",10,"g"]],p:["Biga: 1h T.A. + 23h frigo","Lievitare 1–2 ore","Spezzare 400g con piega a tre","Stendere · olio, origano, sale Maldon"],k:["260° · Misto vapore · v4 · 6 min","+ 2 min · Valvola aperta"],q:"≥ 10 al giorno · Pezzi 400g"},
+  {n:"Pane Licoli",c:"Lievito Madre",i:[["— Idrolisi —",null,"§"],["Farina mista",3000,"g"],["Acqua",2000,"g"],["— Impasto finale —",null,"§"],["Licoli",1000,"g"],["Sale",80,"g"],["Acqua fredda",250,"g"]],p:["Rinfresco 1-1-1 a max 26°","Idrolisi 30–60 min","Aggiungere licoli e impastare","Sale + acqua fredda","4–5h lievitatore 26°","Spezzare e pirlare 15 min","Frigo 12–18h","1h fuori · Tagliare e spruzzare"],k:["260° · Misto vapore 80% · 15 min","180° · Secco · 30 min","160° · Secco · v3 · 15 min · Valvola aperta"],q:"≥ 16 pagnotte/giorno"}
 ];
+var FB_URL=(localStorage.getItem('fb_url')||'').replace(/\/$/,'');
+var currentSection=null,recipes={},dose=1,cat='Tutte',dark=false,editingId=null,syncTimer=null;
 
-/* ═══ Ricette utente (localStorage) ═══ */
-var CU = [];
-(function(){
-  try{var r=window.localStorage&&localStorage.getItem('pan_v1');if(r)CU=JSON.parse(r);}catch(e){CU=[];}
-})();
-function saveC(){try{if(window.localStorage)localStorage.setItem('pan_v1',JSON.stringify(CU));}catch(e){}}
-function all(){return R.concat(CU);}
+/* FIREBASE */
+function fbPath(sec,id){var b=FB_URL+'/ricette/'+sec;return id?b+'/'+id+'.json':b+'.json';}
+function fbGet(sec){return fetch(fbPath(sec)).then(function(r){return r.json();});}
+function fbPost(sec,data){return fetch(fbPath(sec),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
+function fbPut(sec,id,data){return fetch(fbPath(sec,id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
+function fbDel(sec,id){return fetch(fbPath(sec,id),{method:'DELETE'});}
 
-/* ═══ Stato ═══ */
-var dose=1, cat='Tutte', dark=false;
-
-/* ═══ Utility ═══ */
-function el(tag,cls){var e=document.createElement(tag);if(cls)e.className=cls;return e;}
+/* UTILS */
+function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e;}
 function fmtN(v){if(v===null||v===undefined)return '';return(v===Math.floor(v))?String(v):v.toFixed(1);}
 function fmtD(v,d){if(v===null||v===undefined)return 'q.b.';var r=v*d;return(r===Math.floor(r))?String(r):r.toFixed(1);}
+function dot(s){var d=document.getElementById('fbDot');if(d)d.className='fb-status '+(s||'');}
 
-/* ═══ Build Card ═══ */
-function buildCard(r,idx){
-  var card=el('div','card');
-  card.style.animationDelay=(idx*0.045)+'s';
-  card.appendChild(el('div','card-stripe'));
-
-  /* header */
-  var hd=el('div','card-hd');
-  var meta=el('div','card-meta');
-  var num=el('div','card-num');
-  num.textContent='N° '+(idx<9?'0':'')+(idx+1);
-  meta.appendChild(num);
-  if(r.c){var ct=el('div','card-cat');ct.textContent=r.c;meta.appendChild(ct);}
-  var nm=el('div','card-name');nm.textContent=r.n;
-  if(r._c){var star=el('span','card-name-star');star.textContent=' ★';nm.appendChild(star);}
-  hd.appendChild(meta);hd.appendChild(nm);
-  card.appendChild(hd);
-
-  /* ingredients table */
-  var dL=(dose===Math.floor(dose))?String(dose):dose.toFixed(1);
-  var tbl=el('table','tbl');
-  var thead=el('thead');var hr=el('tr');
-  ['Ingrediente','Base','','× '+dL].forEach(function(h,i){
-    var th=el('th');th.textContent=h;
-    if(i===1)th.className='r';
-    if(i===3)th.className='sc';
-    hr.appendChild(th);
-  });
-  thead.appendChild(hr);tbl.appendChild(thead);
-
-  var tb=el('tbody');
-  for(var i=0;i<r.i.length;i++){
-    var ing=r.i[i];
-    var tr=el('tr');
-    if(ing[2]==='§'){
-      tr.className='tr-sec';
-      var tdSec=el('td');tdSec.setAttribute('colspan','4');tdSec.textContent=ing[0];
-      tr.appendChild(tdSec);
-    } else {
-      var tdN=el('td','td-n');tdN.textContent=ing[0];
-      var tdB=el('td','td-b');tdB.textContent=fmtN(ing[1]);
-      var tdU=el('td','td-u');tdU.textContent=ing[2];
-      var tdS=el('td','td-s');
-      tdS.setAttribute('data-b',ing[1]===null?'':ing[1]);
-      tdS.setAttribute('data-u',ing[2]);
-      tdS.textContent=fmtD(ing[1],dose)+(ing[1]!==null?' '+ing[2]:'');
-      tr.appendChild(tdN);tr.appendChild(tdB);tr.appendChild(tdU);tr.appendChild(tdS);
-    }
-    tb.appendChild(tr);
+function setTheme(sec){
+  var s=SECTIONS[sec];
+  var root=document.documentElement;
+  root.style.setProperty('--section-accent',s.accent);
+  if(s.dark){
+    root.style.setProperty('--section-bg','#111110');
+    root.style.setProperty('--card-bg','#161412');
+    root.style.setProperty('--ctrl-bg','#1E1A16');
+    root.style.setProperty('--cream','#111110');
+    root.style.setProperty('--ink','#EDE5D4');
+    root.style.setProperty('--ink2','#CFC3A8');
+    root.style.setProperty('--smoke','#9A8A78');
+    root.style.setProperty('--cream2','#1E1A16');
+    root.style.setProperty('--cream3','#2A2218');
+    root.style.setProperty('--ctrl-border','rgba(201,168,76,.25)');
+    root.style.setProperty('--gold-rim','rgba(201,168,76,.22)');
+    root.style.setProperty('--gold-glow','rgba(201,168,76,.1)');
+    document.body.style.background='#111110';
+  } else {
+    root.style.setProperty('--section-bg','#F5F0E6');
+    root.style.setProperty('--card-bg','#FDFAF3');
+    root.style.setProperty('--ctrl-bg','#EAE0CB');
+    root.style.setProperty('--cream','#F5F0E6');
+    root.style.setProperty('--ink','#1A1410');
+    root.style.setProperty('--ink2','#2A2018');
+    root.style.setProperty('--smoke','#6E6050');
+    root.style.setProperty('--cream2','#EDE5D4');
+    root.style.setProperty('--cream3','#E0D5C0');
+    root.style.setProperty('--ctrl-border','rgba(139,94,26,.22)');
+    root.style.setProperty('--gold-rim','rgba(139,94,26,.22)');
+    root.style.setProperty('--gold-glow','rgba(139,94,26,.12)');
+    document.body.style.background='#F5F0E6';
   }
-  tbl.appendChild(tb);
-  card.appendChild(tbl);
-
-  /* processo */
-  if(r.p&&r.p.length){
-    var ps=el('div','proc-sec');
-    var pl=el('div','sec-label');pl.textContent='Processo';ps.appendChild(pl);
-    var ul=el('ul','proc-list');
-    for(var j=0;j<r.p.length;j++){
-      var li=el('li','proc-item');
-      var pn=el('span','proc-n');pn.textContent=(j+1)+'.';
-      li.appendChild(pn);li.appendChild(document.createTextNode(r.p[j]));
-      ul.appendChild(li);
-    }
-    ps.appendChild(ul);card.appendChild(ps);
-  }
-
-  /* cottura */
-  if(r.k&&r.k.length){
-    var cs=el('div','cott-sec');
-    var cl=el('div','sec-label');cl.textContent='Cottura';cs.appendChild(cl);
-    var cc=el('div','cott-list');
-    for(var m=0;m<r.k.length;m++){
-      var ch=el('div','cott-chip');
-      /* small arrow */
-      var arr=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      arr.setAttribute('viewBox','0 0 16 16');arr.setAttribute('fill','none');
-      arr.setAttribute('class','cott-arrow');
-      var poly=document.createElementNS('http://www.w3.org/2000/svg','polyline');
-      poly.setAttribute('points','4,4 10,8 4,12');
-      poly.setAttribute('stroke','currentColor');poly.setAttribute('stroke-width','1.8');
-      poly.setAttribute('stroke-linecap','round');poly.setAttribute('stroke-linejoin','round');
-      arr.appendChild(poly);
-      ch.appendChild(arr);
-      ch.appendChild(document.createTextNode(r.k[m]));
-      cc.appendChild(ch);
-    }
-    cs.appendChild(cc);card.appendChild(cs);
-  }
-
-  /* target */
-  if(r.q){
-    var tg=el('div','target-bar');
-    var dot=el('span','target-dot');
-    tg.appendChild(dot);tg.appendChild(document.createTextNode(r.q));
-    card.appendChild(tg);
-  }
-
-  return card;
 }
 
-/* ═══ Categories ═══ */
+/* NAVIGATION */
+function showLanding(){
+  document.getElementById('landing').style.display='flex';
+  document.getElementById('app').classList.remove('visible');
+  currentSection=null;
+  if(syncTimer){clearInterval(syncTimer);syncTimer=null;}
+}
+function showSection(sec){
+  currentSection=sec;
+  var s=SECTIONS[sec];
+  setTheme(sec);
+  document.getElementById('appTitle').textContent=s.label;
+  document.getElementById('appSub').textContent=s.sub;
+  var mc=document.getElementById('mc');mc.innerHTML='';
+  s.cats.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;mc.appendChild(o);});
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  dose=1;cat='Tutte';
+  document.getElementById('dval').value=1;
+  document.getElementById('srch').value='';
+  loadRecipes(sec);
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=setInterval(function(){if(currentSection)loadRecipes(currentSection,true);},45000);
+}
+
+/* LOAD */
+function loadRecipes(sec,silent){
+  if(!FB_URL){recipes={};showEmpty('Configura Firebase per iniziare →');return;}
+  if(!silent){document.getElementById('grid').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';dot('loading');}
+  fbGet(sec).then(function(data){
+    dot('ok');recipes={};
+    if(data&&typeof data==='object'){var keys=Object.keys(data);for(var i=0;i<keys.length;i++){if(data[keys[i]])recipes[keys[i]]=data[keys[i]];}}
+    if(sec==='panificazione'&&Object.keys(recipes).length===0){seed(sec,SEED_PANI);return;}
+    buildCats();render();
+  }).catch(function(){dot('err');if(!silent)showEmpty('Errore connessione Firebase');});
+}
+function seed(sec,data){
+  data.forEach(function(r){r.ts=Date.now();fbPost(sec,r);});
+  setTimeout(function(){loadRecipes(sec);},1200);
+}
+function showEmpty(msg){
+  var g=document.getElementById('grid');g.innerHTML='';
+  var em=el('div','empty');em.style.gridColumn='1/-1';
+  var ei=el('div','empty-ico');ei.textContent='✦';
+  var ep=el('p');ep.textContent=msg||'Nessuna ricetta trovata';
+  em.appendChild(ei);em.appendChild(ep);g.appendChild(em);
+  var cnt=document.getElementById('cnt');if(cnt)cnt.textContent='';
+}
+
+/* CATEGORIES */
 function buildCats(){
-  var bar=document.getElementById('catbar');if(!bar)return;
-  bar.innerHTML='';
-  var a=all(),cats=['Tutte'];
-  for(var i=0;i<a.length;i++){if(a[i].c&&cats.indexOf(a[i].c)===-1)cats.push(a[i].c);}
+  var bar=document.getElementById('catbar');if(!bar)return;bar.innerHTML='';
+  var cats=['Tutte'],keys=Object.keys(recipes);
+  for(var i=0;i<keys.length;i++){var c=recipes[keys[i]].c;if(c&&cats.indexOf(c)===-1)cats.push(c);}
   cats.forEach(function(c){
     var b=el('button','cpill'+(c===cat?' on':''));b.textContent=c;b.type='button';
     b.addEventListener('click',function(){
       cat=c;
-      document.querySelectorAll('.cpill').forEach(function(p){p.className='cpill';});
+      var all=document.querySelectorAll('.cpill');
+      for(var i=0;i<all.length;i++)all[i].className='cpill';
       b.className='cpill on';render();
     });
     bar.appendChild(b);
   });
 }
 
-/* ═══ Render ═══ */
+/* RENDER */
 function render(){
-  var grid=document.getElementById('grid');if(!grid)return;
-  grid.innerHTML='';
+  var grid=document.getElementById('grid');if(!grid)return;grid.innerHTML='';
   var q=((document.getElementById('srch')||{}).value||'').toLowerCase().trim();
-  var a=all(),out=[];
-  for(var i=0;i<a.length;i++){
-    if(a[i].n.toLowerCase().indexOf(q)!==-1&&(cat==='Tutte'||a[i].c===cat))out.push(a[i]);
+  var keys=Object.keys(recipes),out=[];
+  for(var i=0;i<keys.length;i++){
+    var r=recipes[keys[i]];if(!r)continue;
+    if((!q||(r.n||'').toLowerCase().indexOf(q)!==-1)&&(cat==='Tutte'||r.c===cat))out.push({id:keys[i],r:r});
   }
-  var cd=document.getElementById('cnt');
-  if(cd)cd.textContent=out.length+' / '+a.length+' ricette';
-  if(!out.length){
-    var em=el('div','empty');em.style.gridColumn='1/-1';
-    var ei=el('div','empty-ico');ei.textContent='⌀';
-    var ep=el('p');ep.textContent='Nessuna ricetta trovata';
-    em.appendChild(ei);em.appendChild(ep);grid.appendChild(em);return;
-  }
-  out.forEach(function(r,j){grid.appendChild(buildCard(r,j));});
+  out.sort(function(a,b){return(a.r.n||'').localeCompare(b.r.n||'','it');});
+  var cnt=document.getElementById('cnt');
+  if(cnt)cnt.textContent=out.length+' / '+keys.length+' ricette';
+  if(!out.length){showEmpty();return;}
+  out.forEach(function(item,j){grid.appendChild(buildCard(item.r,item.id,j));});
 }
 
-/* ═══ Dose update ═══ */
+/* CARD */
+function buildCard(r,id,idx){
+  var card=el('div','card');card.style.animationDelay=(idx*0.04)+'s';
+  card.appendChild(el('div','card-stripe'));
+  var hd=el('div','card-hd');
+  var meta=el('div','card-meta');
+  var num=el('div','card-num');num.textContent='N° '+(idx<9?'0':'')+(idx+1);meta.appendChild(num);
+  if(r.c){var ct=el('div','card-cat');ct.textContent=r.c;meta.appendChild(ct);}
+  var nm=el('div','card-name');nm.textContent=r.n;
+  hd.appendChild(meta);hd.appendChild(nm);
+  var acts=el('div','card-actions');
+  var eb=el('button','card-action-btn');eb.title='Modifica';
+  eb.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M11 2l3 3-8 8H3v-3L11 2z"/></svg>';
+  eb.addEventListener('click',function(e){e.stopPropagation();openEdit(id,r);});
+  var db=el('button','card-action-btn del');db.title='Elimina';
+  db.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M3 4l1 10h8l1-10"/></svg>';
+  db.addEventListener('click',function(e){e.stopPropagation();confirmDel(id,r.n);});
+  acts.appendChild(eb);acts.appendChild(db);hd.appendChild(acts);card.appendChild(hd);
+  if(r.i&&r.i.length){
+    var dL=(dose===Math.floor(dose))?String(dose):dose.toFixed(1);
+    var tbl=el('table','tbl');var thead=el('thead');var hr=el('tr');
+    ['Ingrediente','Base','','× '+dL].forEach(function(h,i){var th=el('th');th.textContent=h;if(i===1)th.className='r';if(i===3)th.className='sc';hr.appendChild(th);});
+    thead.appendChild(hr);tbl.appendChild(thead);
+    var tb=el('tbody');
+    for(var i=0;i<r.i.length;i++){
+      var ing=r.i[i];var tr=el('tr');
+      if(ing[2]==='§'){tr.className='tr-sec';var tds=el('td');tds.setAttribute('colspan','4');tds.textContent=ing[0];tr.appendChild(tds);}
+      else{var tN=el('td','td-n');tN.textContent=ing[0];var tB=el('td','td-b r');tB.textContent=fmtN(ing[1]);var tU=el('td','td-u');tU.textContent=ing[2];var tS=el('td','td-s');tS.setAttribute('data-b',ing[1]===null?'':ing[1]);tS.setAttribute('data-u',ing[2]);tS.textContent=fmtD(ing[1],dose)+(ing[1]!==null?' '+ing[2]:'');tr.appendChild(tN);tr.appendChild(tB);tr.appendChild(tU);tr.appendChild(tS);}
+      tb.appendChild(tr);
+    }
+    tbl.appendChild(tb);card.appendChild(tbl);
+  }
+  if(r.p&&r.p.length){var ps=el('div','proc-sec');var pl=el('div','sec-label');pl.textContent='Processo';ps.appendChild(pl);var ul=el('ul','proc-list');for(var j=0;j<r.p.length;j++){var li=el('li','proc-item');var pn=el('span','proc-n');pn.textContent=(j+1)+'.';li.appendChild(pn);li.appendChild(document.createTextNode(r.p[j]));ul.appendChild(li);}ps.appendChild(ul);card.appendChild(ps);}
+  if(r.k&&r.k.length){var cs=el('div','cott-sec');var cl=el('div','sec-label');cl.textContent='Cottura';cs.appendChild(cl);var cc=el('div','cott-list');for(var m=0;m<r.k.length;m++){var ch=el('div','cott-chip');var arr=document.createElementNS('http://www.w3.org/2000/svg','svg');arr.setAttribute('viewBox','0 0 16 16');arr.setAttribute('fill','none');arr.setAttribute('class','cott-arrow');var poly=document.createElementNS('http://www.w3.org/2000/svg','polyline');poly.setAttribute('points','4,4 10,8 4,12');poly.setAttribute('stroke','currentColor');poly.setAttribute('stroke-width','1.8');poly.setAttribute('stroke-linecap','round');poly.setAttribute('stroke-linejoin','round');arr.appendChild(poly);ch.appendChild(arr);ch.appendChild(document.createTextNode(r.k[m]));cc.appendChild(ch);}cs.appendChild(cc);card.appendChild(cs);}
+  if(r.q){var tg=el('div','target-bar');var tdot=el('span','target-dot');tg.appendChild(tdot);tg.appendChild(document.createTextNode(r.q));card.appendChild(tg);}
+  return card;
+}
+
+/* DOSE */
 function updDose(){
   var dl=(dose===Math.floor(dose))?String(dose):dose.toFixed(1);
-  document.querySelectorAll('.tbl thead th.sc').forEach(function(th){th.textContent='× '+dl;});
-  document.querySelectorAll('.td-s').forEach(function(td){
-    var b=td.getAttribute('data-b'),u=td.getAttribute('data-u');
-    if(b===''){td.textContent='q.b.';return;}
-    td.textContent=fmtD(parseFloat(b),dose)+' '+u;
-  });
+  var ths=document.querySelectorAll('.tbl thead th.sc');for(var i=0;i<ths.length;i++)ths[i].textContent='× '+dl;
+  var tds=document.querySelectorAll('.td-s');
+  for(var j=0;j<tds.length;j++){var b=tds[j].getAttribute('data-b'),u=tds[j].getAttribute('data-u');if(b===''){tds[j].textContent='q.b.';continue;}tds[j].textContent=fmtD(parseFloat(b),dose)+' '+u;}
   var dv=document.getElementById('dval');if(dv)dv.value=dose;
 }
 
-/* ═══ Modal helpers ═══ */
-function addIng(n,q,u){
+/* MODAL */
+function addIng(il,n,q,u){
   var row=el('div','ing-row');
   var ni=el('input');ni.type='text';ni.placeholder='Ingrediente';ni.value=n||'';ni.autocomplete='off';
-  var qi=el('input');qi.type='number';qi.placeholder='Qtà';qi.value=q||'';qi.min='0';qi.step='any';qi.inputMode='decimal';
-  var ui=el('input');ui.type='text';ui.placeholder='g / n°';ui.value=u||'';ui.autocomplete='off';
+  var qi=el('input');qi.type='number';qi.placeholder='Qtà';qi.value=(q!==null&&q!==undefined)?q:'';qi.min='0';qi.step='any';
+  var ui=el('input');ui.type='text';ui.placeholder='g / ml / n°';ui.value=u||'';ui.autocomplete='off';
   var rm=el('button','rm');rm.type='button';rm.textContent='×';
-  rm.addEventListener('click',function(){var il=document.getElementById('ilist');if(il&&il.children.length>1)il.removeChild(row);});
+  rm.addEventListener('click',function(){if(il.children.length>1)il.removeChild(row);});
   row.appendChild(ni);row.appendChild(qi);row.appendChild(ui);row.appendChild(rm);
-  document.getElementById('ilist').appendChild(row);
+  il.appendChild(row);
+}
+function addStep(sl,val){
+  var row=el('div','step-row');
+  var inp=el('input');inp.type='text';inp.placeholder='Step…';inp.value=val||'';inp.autocomplete='off';
+  var rm=el('button','rm');rm.type='button';rm.textContent='×';
+  rm.addEventListener('click',function(){sl.removeChild(row);});
+  row.appendChild(inp);row.appendChild(rm);sl.appendChild(row);
 }
 function resetModal(){
-  var mn=document.getElementById('mn');if(mn)mn.value='';
-  var il=document.getElementById('ilist');if(il){il.innerHTML='';addIng();}
+  editingId=null;
+  document.getElementById('modalTitle').textContent='Nuova Ricetta';
+  document.getElementById('mn').value='';document.getElementById('mq').value='';
+  var mc=document.getElementById('mc');if(mc)mc.selectedIndex=0;
+  var il=document.getElementById('ilist');il.innerHTML='';addIng(il);
+  document.getElementById('proclist').innerHTML='';
+  document.getElementById('cottlist').innerHTML='';
+  document.getElementById('bdel').style.display='none';
 }
-function openModal(){resetModal();document.getElementById('mbg').classList.add('open');}
+function openEdit(id,r){
+  editingId=id;
+  document.getElementById('modalTitle').textContent='Modifica Ricetta';
+  document.getElementById('mn').value=r.n||'';document.getElementById('mq').value=r.q||'';
+  var mc=document.getElementById('mc');
+  for(var o=0;o<mc.options.length;o++){if(mc.options[o].value===r.c){mc.selectedIndex=o;break;}}
+  var il=document.getElementById('ilist');il.innerHTML='';
+  if(r.i&&r.i.length)r.i.forEach(function(ing){addIng(il,ing[0],ing[1],ing[2]);});else addIng(il);
+  var pl=document.getElementById('proclist');pl.innerHTML='';
+  if(r.p&&r.p.length)r.p.forEach(function(s){addStep(pl,s);});
+  var cl=document.getElementById('cottlist');cl.innerHTML='';
+  if(r.k&&r.k.length)r.k.forEach(function(s){addStep(cl,s);});
+  document.getElementById('bdel').style.display='flex';
+  document.getElementById('mbg').classList.add('open');
+}
 function closeModal(){document.getElementById('mbg').classList.remove('open');}
 
-/* ═══ Init ═══ */
-function init(){
-  /* search */
-  var srch=document.getElementById('srch');if(srch)srch.addEventListener('input',render);
+function confirmDel(id,name){
+  if(!confirm('Eliminare "'+name+'"?'))return;
+  if(!FB_URL){alert('Firebase non configurato.');return;}
+  dot('loading');
+  fbDel(currentSection,id).then(function(){delete recipes[id];buildCats();render();dot('ok');}).catch(function(){dot('err');alert('Errore eliminazione.');});
+}
 
-  /* dose */
-  var dv=document.getElementById('dval');
-  if(dv)dv.addEventListener('change',function(){dose=Math.max(0.5,parseFloat(this.value)||1);updDose();});
+function saveRecipe(){
+  if(!FB_URL){alert('Configura Firebase prima di salvare.');return;}
+  var name=(document.getElementById('mn').value||'').trim();
+  if(!name){alert('Inserisci il nome della ricetta.');return;}
+  var mc=document.getElementById('mc');var catV=mc?mc.value:'Altro';
+  var rows=document.getElementById('ilist').querySelectorAll('.ing-row');
+  var ings=[];
+  for(var ri=0;ri<rows.length;ri++){var ins=rows[ri].querySelectorAll('input');var iN=(ins[0].value||'').trim();var iQ=ins[1].value!==''?parseFloat(ins[1].value):null;var iU=(ins[2].value||'').trim()||'g';if(iN)ings.push([iN,iQ,iU]);}
+  if(!ings.length){alert('Aggiungi almeno un ingrediente.');return;}
+  var prows=document.getElementById('proclist').querySelectorAll('.step-row input');
+  var proc=[];for(var pi=0;pi<prows.length;pi++){var sv=(prows[pi].value||'').trim();if(sv)proc.push(sv);}
+  var crows=document.getElementById('cottlist').querySelectorAll('.step-row input');
+  var cott=[];for(var ci=0;ci<crows.length;ci++){var cv=(crows[ci].value||'').trim();if(cv)cott.push(cv);}
+  var mq=(document.getElementById('mq').value||'').trim();
+  var rec={n:name,c:catV,i:ings,ts:Date.now()};
+  if(proc.length)rec.p=proc;if(cott.length)rec.k=cott;if(mq)rec.q=mq;
+  dot('loading');
+  if(editingId){
+    fbPut(currentSection,editingId,rec).then(function(){recipes[editingId]=rec;dot('ok');buildCats();render();closeModal();}).catch(function(){dot('err');alert('Errore salvataggio.');});
+  } else {
+    fbPost(currentSection,rec).then(function(result){if(result&&result.name){recipes[result.name]=rec;dot('ok');buildCats();render();closeModal();}}).catch(function(){dot('err');alert('Errore salvataggio.');});
+  }
+}
+
+/* FIREBASE SETUP */
+function openFbModal(){document.getElementById('fbUrlInput').value=FB_URL||'';document.getElementById('fbmodal').classList.add('open');}
+function closeFbModal(){document.getElementById('fbmodal').classList.remove('open');}
+function saveFbUrl(){
+  var v=(document.getElementById('fbUrlInput').value||'').trim().replace(/\/$/,'');
+  if(!v){alert('Inserisci l\'URL.');return;}
+  if(!v.startsWith('https://')){alert('L\'URL deve iniziare con https://');return;}
+  FB_URL=v;localStorage.setItem('fb_url',v);closeFbModal();dot('ok');
+  if(currentSection)loadRecipes(currentSection);
+}
+
+/* INIT */
+function init(){
+  dot(FB_URL?'ok':'');
+  var cards=document.querySelectorAll('.land-card');
+  for(var ci=0;ci<cards.length;ci++){(function(c){c.addEventListener('click',function(){var s=c.getAttribute('data-s');if(s)showSection(s);});})(cards[ci]);}
+  var cfgBtn=document.getElementById('cfgBtn');if(cfgBtn)cfgBtn.addEventListener('click',openFbModal);
+  var backBtn=document.getElementById('backBtn');if(backBtn)backBtn.addEventListener('click',showLanding);
+  var srch=document.getElementById('srch');if(srch)srch.addEventListener('input',render);
+  var dv=document.getElementById('dval');if(dv)dv.addEventListener('change',function(){dose=Math.max(0.5,parseFloat(this.value)||1);updDose();});
   var dp=document.getElementById('dplus');if(dp)dp.addEventListener('click',function(){dose=Math.round((dose+0.5)*10)/10;updDose();});
   var dm=document.getElementById('dminus');if(dm)dm.addEventListener('click',function(){dose=Math.max(0.5,Math.round((dose-0.5)*10)/10);updDose();});
-
-  /* view toggle */
   var vg=document.getElementById('vgrid'),vl=document.getElementById('vlist');
   if(vg)vg.addEventListener('click',function(){document.getElementById('grid').classList.remove('list');vg.className='vbtn on';if(vl)vl.className='vbtn';});
   if(vl)vl.addEventListener('click',function(){document.getElementById('grid').classList.add('list');vl.className='vbtn on';if(vg)vg.className='vbtn';});
-
-  /* theme */
   var tb=document.getElementById('tbtn');
-  if(tb)tb.addEventListener('click',function(){
-    dark=!dark;
-    if(dark)document.documentElement.setAttribute('data-dark','');
-    else document.documentElement.removeAttribute('data-dark');
-    var ti=document.getElementById('ticon'),tl=document.getElementById('tlbl');
-    if(ti)ti.textContent=dark?'☀️':'🌙';
-    if(tl)tl.textContent=dark?'Chiaro':'Scuro';
-  });
-
-  /* fab + modal */
-  var fab=document.getElementById('fab');if(fab)fab.addEventListener('click',openModal);
-  var bc=document.getElementById('bcanc');if(bc)bc.addEventListener('click',closeModal);
+  if(tb)tb.addEventListener('click',function(){dark=!dark;if(dark)document.documentElement.setAttribute('data-dark','');else document.documentElement.removeAttribute('data-dark');var ti=document.getElementById('ticon'),tl=document.getElementById('tlbl');if(ti)ti.textContent=dark?'☀️':'🌙';if(tl)tl.textContent=dark?' Chiaro':' Scuro';});
+  var fab=document.getElementById('fab');if(fab)fab.addEventListener('click',function(){resetModal();document.getElementById('mbg').classList.add('open');});
+  var bcanc=document.getElementById('bcanc');if(bcanc)bcanc.addEventListener('click',closeModal);
   var mbg=document.getElementById('mbg');if(mbg)mbg.addEventListener('click',function(e){if(e.target===mbg)closeModal();});
-  var badd=document.getElementById('badd');if(badd)badd.addEventListener('click',function(){addIng();});
-  var bsave=document.getElementById('bsave');
-  if(bsave)bsave.addEventListener('click',function(){
-    var name=(document.getElementById('mn').value||'').trim();
-    if(!name){alert('Inserisci il nome della ricetta');return;}
-    var mc=document.getElementById('mc'),catV=mc?mc.value:'Altro';
-    var rows=document.getElementById('ilist').querySelectorAll('.ing-row');
-    var ings=[];
-    rows.forEach(function(row){
-      var ins=row.querySelectorAll('input');
-      var iN=(ins[0].value||'').trim(),iQ=ins[1].value?parseFloat(ins[1].value):null,iU=(ins[2].value||'').trim()||'g';
-      if(iN)ings.push([iN,iQ,iU]);
-    });
-    if(!ings.length){alert('Aggiungi almeno un ingrediente');return;}
-    CU.push({n:name,c:catV,i:ings,_c:true});
-    saveC();closeModal();buildCats();render();
-  });
-
-  buildCats();render();
+  var badd=document.getElementById('badd');if(badd)badd.addEventListener('click',function(){addIng(document.getElementById('ilist'));});
+  var bap=document.getElementById('baddProc');if(bap)bap.addEventListener('click',function(){addStep(document.getElementById('proclist'));});
+  var bac=document.getElementById('baddCott');if(bac)bac.addEventListener('click',function(){addStep(document.getElementById('cottlist'));});
+  var bdel=document.getElementById('bdel');
+  if(bdel)bdel.addEventListener('click',function(){if(editingId&&recipes[editingId]){var nm=recipes[editingId].n||'questa ricetta';closeModal();confirmDel(editingId,nm);}});
+  var bsave=document.getElementById('bsave');if(bsave)bsave.addEventListener('click',saveRecipe);
+  var fbCancel=document.getElementById('fbCancel');if(fbCancel)fbCancel.addEventListener('click',closeFbModal);
+  var fbSave=document.getElementById('fbSave');if(fbSave)fbSave.addEventListener('click',saveFbUrl);
+  var fbmodal=document.getElementById('fbmodal');if(fbmodal)fbmodal.addEventListener('click',function(e){if(e.target===fbmodal)closeFbModal();});
 }
-
-/* ═══ Boot (iOS safe) ═══ */
 var _booted=false;
 function boot(){if(_booted)return;_booted=true;init();}
 document.addEventListener('DOMContentLoaded',boot);
