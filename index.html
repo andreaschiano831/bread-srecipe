@@ -363,7 +363,9 @@ var SEED_PANI=[
   {n:"Pizza Pala",c:"Pizza & Focaccia",i:[["— Biga —",null,"§"],["Farina",1000,"g"],["Acqua",450,"g"],["Lievito fresco",10,"g"],["— Impasto finale —",null,"§"],["Malto",10,"g"],["Sale",20,"g"],["Licoli",300,"g"],["Acqua",350,"g"],["Olio",50,"g"],["Lievito",10,"g"]],p:["Biga: 1h T.A. + 23h frigo","Lievitare 1–2 ore","Spezzare 400g con piega a tre","Stendere · olio, origano, sale Maldon"],k:["260° · Misto vapore · v4 · 6 min","+ 2 min · Valvola aperta"],q:"≥ 10 al giorno · Pezzi 400g"},
   {n:"Pane Licoli",c:"Lievito Madre",i:[["— Idrolisi —",null,"§"],["Farina mista",3000,"g"],["Acqua",2000,"g"],["— Impasto finale —",null,"§"],["Licoli",1000,"g"],["Sale",80,"g"],["Acqua fredda",250,"g"]],p:["Rinfresco 1-1-1 a max 26°","Idrolisi 30–60 min","Aggiungere licoli e impastare","Sale + acqua fredda","4–5h lievitatore 26°","Spezzare e pirlare 15 min","Frigo 12–18h","1h fuori · Tagliare e spruzzare"],k:["260° · Misto vapore 80% · 15 min","180° · Secco · 30 min","160° · Secco · v3 · 15 min · Valvola aperta"],q:"≥ 16 pagnotte/giorno"}
 ];
-var FB_URL=(localStorage.getItem('fb_url')||'').replace(/\/$/,'');
+var FB_URL='https://recipe-d2872-default-rtdb.firebaseio.com';
+// Aggiorna l'URL salvato nel localStorage se diverso
+try{localStorage.setItem('fb_url',FB_URL);}catch(e){}
 var currentSection=null,recipes={},dose=1,cat='Tutte',dark=false,editingId=null,syncTimer=null;
 
 /* FIREBASE */
@@ -382,8 +384,9 @@ function dot(s){var d=document.getElementById('fbDot');if(d)d.className='fb-stat
 function setTheme(sec){
   var s=SECTIONS[sec];
   var root=document.documentElement;
+  var isDark=dark||s.dark; // section can force dark (fine-dining)
   root.style.setProperty('--section-accent',s.accent);
-  if(s.dark){
+  if(isDark){
     root.style.setProperty('--section-bg','#111110');
     root.style.setProperty('--card-bg','#161412');
     root.style.setProperty('--ctrl-bg','#1E1A16');
@@ -391,9 +394,11 @@ function setTheme(sec){
     root.style.setProperty('--ink','#EDE5D4');
     root.style.setProperty('--ink2','#CFC3A8');
     root.style.setProperty('--smoke','#9A8A78');
+    root.style.setProperty('--smoke2','#7A6A58');
+    root.style.setProperty('--smoke3','#5A4A3A');
     root.style.setProperty('--cream2','#1E1A16');
     root.style.setProperty('--cream3','#2A2218');
-    root.style.setProperty('--ctrl-border','rgba(201,168,76,.25)');
+    root.style.setProperty('--ctrl-border','rgba(201,168,76,.22)');
     root.style.setProperty('--gold-rim','rgba(201,168,76,.22)');
     root.style.setProperty('--gold-glow','rgba(201,168,76,.1)');
     document.body.style.background='#111110';
@@ -405,6 +410,8 @@ function setTheme(sec){
     root.style.setProperty('--ink','#1A1410');
     root.style.setProperty('--ink2','#2A2018');
     root.style.setProperty('--smoke','#6E6050');
+    root.style.setProperty('--smoke2','#9A8A78');
+    root.style.setProperty('--smoke3','#C2B49E');
     root.style.setProperty('--cream2','#EDE5D4');
     root.style.setProperty('--cream3','#E0D5C0');
     root.style.setProperty('--ctrl-border','rgba(139,94,26,.22)');
@@ -645,7 +652,30 @@ function init(){
   if(vg)vg.addEventListener('click',function(){document.getElementById('grid').classList.remove('list');vg.className='vbtn on';if(vl)vl.className='vbtn';});
   if(vl)vl.addEventListener('click',function(){document.getElementById('grid').classList.add('list');vl.className='vbtn on';if(vg)vg.className='vbtn';});
   var tb=document.getElementById('tbtn');
-  if(tb)tb.addEventListener('click',function(){dark=!dark;if(dark)document.documentElement.setAttribute('data-dark','');else document.documentElement.removeAttribute('data-dark');var ti=document.getElementById('ticon'),tl=document.getElementById('tlbl');if(ti)ti.textContent=dark?'☀️':'🌙';if(tl)tl.textContent=dark?' Chiaro':' Scuro';});
+  if(tb)tb.addEventListener('click',function(){
+    dark=!dark;
+    var ti=document.getElementById('ticon'),tl=document.getElementById('tlbl');
+    if(ti)ti.textContent=dark?'☀️':'🌙';
+    if(tl)tl.textContent=dark?' Chiaro':' Scuro';
+    if(currentSection)setTheme(currentSection);
+    else{
+      // landing page dark toggle
+      var root=document.documentElement;
+      if(dark){
+        root.style.setProperty('--ink','#EDE5D4');root.style.setProperty('--cream','#1A1410');
+        root.style.setProperty('--card-bg','#211912');root.style.setProperty('--ctrl-bg','#2A201A');
+        root.style.setProperty('--smoke2','#7A6A58');root.style.setProperty('--smoke','#9A8A78');
+        document.body.style.background='#1A1410';
+        document.getElementById('landing').style.background='#1A1410';
+      } else {
+        root.style.setProperty('--ink','#1A1410');root.style.setProperty('--cream','#F5F0E6');
+        root.style.setProperty('--card-bg','#FDFAF3');root.style.setProperty('--ctrl-bg','#EAE0CB');
+        root.style.setProperty('--smoke2','#9A8A78');root.style.setProperty('--smoke','#6E6050');
+        document.body.style.background='#F5F0E6';
+        document.getElementById('landing').style.background='#F5F0E6';
+      }
+    }
+  });
   var fab=document.getElementById('fab');if(fab)fab.addEventListener('click',function(){resetModal();document.getElementById('mbg').classList.add('open');});
   var bcanc=document.getElementById('bcanc');if(bcanc)bcanc.addEventListener('click',closeModal);
   var mbg=document.getElementById('mbg');if(mbg)mbg.addEventListener('click',function(e){if(e.target===mbg)closeModal();});
