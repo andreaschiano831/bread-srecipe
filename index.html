@@ -536,7 +536,17 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
 <script>
 /* ══════════════════════ CONFIG ══════════════════════ */
 var ADMIN_PIN='durso2026';
-var FB_URL=(function(){try{return localStorage.getItem('fb_url')||'';}catch(e){return '';}})();
+
+/* ▼▼▼  INSERISCI QUI L'URL FIREBASE UNA VOLTA SOLA  ▼▼▼
+   Es: 'https://il-tuo-progetto-default-rtdb.firebaseio.com'
+   Lascia '' per usare solo il valore salvato dall'admin.        */
+var FIREBASE_HARDCODED='https://console.firebase.google.com/u/1/project/pane-ef699/database/pane-ef699-default-rtdb/data/~2F';
+
+/* Priorità: hardcoded → localStorage → '' */
+var FB_URL=(function(){
+  if(FIREBASE_HARDCODED)return FIREBASE_HARDCODED.replace(/\/$/,'');
+  try{return localStorage.getItem('fb_url')||'';}catch(e){return '';}
+})();
 
 var SECTIONS={
   'panificazione':{label:'Panificazione',sub:'Pane · Lievitati · Pizza · Focaccia',cats:['Pane','Panini','Pizza & Focaccia','Lievito Madre','Biga','Senza Glutine','Altro'],accent:'#4A7E55'},
@@ -545,11 +555,77 @@ var SECTIONS={
 };
 
 var SEED_PANI=[
-  {n:"Grissini",c:"Pane",i:[["Farina 00",500,"g"],["Farina 0",250,"g"],["Olio di oliva",200,"g"],["Acqua",350,"g"],["Sale",20,"g"],["Lievito fresco",15,"g"]],p:"Impastare non troppo. Lievitare 1–2 ore. Spezzare e riposo 30 min.",k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],q:"≥ 60 pz a sera",ts:1700000000000},
-  {n:"Bun",c:"Panini",i:[["Farina 00",500,"g"],["Farina 0",500,"g"],["Latte s.l.",285,"g"],["Acqua",285,"g"],["Burro morbido",100,"g"],["Sale",25,"g"],["Zucchero",20,"g"],["Lievito fresco",30,"g"]],p:"Impastare. Lievitare 1–2 ore. Spezzare 25g × 6 stampo rosetta. Lievitare e infornare.",q:"6 gelo + 6 freschi",ts:1700000001000},
-  {n:"Biga per Pane",c:"Biga",i:[["— Biga —",null,"§"],["Farina",2200,"g"],["Acqua",1120,"g"],["Lievito fresco",26,"g"],["Malto",3,"g"],["— Autolisi —",null,"§"],["Farina semola",1000,"g"],["Farina bianca",500,"g"],["Acqua",1000,"g"],["— Impasto finale —",null,"§"],["Malto",5,"g"],["Sale",80,"g"],["Licoli",300,"g"],["Acqua",200,"g"]],p:"Biga: 1h T.A. + 23h frigo. Autolisi: 1 ora. Impastare biga + autolisi + finale. Pezzi da 450g.",q:"≥ 10 baguette",ts:1700000002000},
-  {n:"Pizza Pala",c:"Pizza & Focaccia",i:[["— Biga —",null,"§"],["Farina",1000,"g"],["Acqua",450,"g"],["Lievito fresco",10,"g"],["— Impasto finale —",null,"§"],["Malto",10,"g"],["Sale",20,"g"],["Licoli",300,"g"],["Acqua",350,"g"],["Olio",50,"g"],["Lievito",10,"g"]],p:"Biga: 1h T.A. + 23h frigo. Lievitare 1–2 ore. Spezzare 400g con piega a tre. Stendere · olio, origano, sale Maldon.",k:["260° · Misto vapore · v4 · 6 min","+ 2 min · Valvola aperta"],q:"≥ 10 al giorno · Pezzi 400g",ts:1700000003000},
-  {n:"Pane Licoli",c:"Lievito Madre",i:[["— Idrolisi —",null,"§"],["Farina mista",3000,"g"],["Acqua",2000,"g"],["— Impasto finale —",null,"§"],["Licoli",1000,"g"],["Sale",80,"g"],["Acqua fredda",250,"g"]],p:"Rinfresco 1-1-1 a max 26°. Idrolisi 30–60 min. Aggiungere licoli e impastare. Sale + acqua fredda. 4–5h lievitatore 26°. Spezzare e pirlare 15 min. Frigo 12–18h. 1h fuori · Tagliare e spruzzare.",k:["260° · Misto vapore 80% · 15 min","180° · Secco · 30 min","160° · Secco · v3 · 15 min · Valvola aperta"],q:"≥ 16 pagnotte/giorno",ts:1700000004000}
+  /* ─── PANE ─── */
+  {n:"Grissini",c:"Pane",s:"panificazione",
+    i:[["Farina 00",500,"g"],["Farina 0",250,"g"],["Olio di oliva",200,"g"],["Acqua",350,"g"],["Sale",20,"g"],["Lievito fresco",15,"g"]],
+    p:"Impastare non troppo. Lievitare 1–2 ore. Spezzare · riposo 30 min · infornare.",
+    k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],
+    q:"≥ 60 pz a sera",ts:1700000000000},
+
+  {n:"Pane Celiaci",c:"Senza Glutine",s:"panificazione",
+    i:[["Farina celiaca",1000,"g"],["Acqua",750,"g"],["Lievito fresco",30,"g"],["Sale",25,"g"],["Miele",20,"g"]],
+    p:"Impastare. Lievitare. Spezzare quadrati. Lievitare e infornare.",
+    q:"≥ 2 buste da 20 pz gelo",ts:1700000010000},
+
+  /* ─── PANINI ─── */
+  {n:"Bun",c:"Panini",s:"panificazione",
+    i:[["Farina 00",500,"g"],["Farina 0",500,"g"],["Latte s.l.",285,"g"],["Acqua",285,"g"],["Burro morbido",100,"g"],["Sale",25,"g"],["Zucchero",20,"g"],["Lievito fresco",30,"g"]],
+    p:"Impastare. Lievitare 1–2 ore. Spezzare 25g × 6 stampo rosetta. Lievitare e infornare.",
+    q:"6 gelo + 6 freschi",ts:1700000001000},
+
+  {n:"Panini Formaggio & Uvetta",c:"Panini",s:"panificazione",
+    i:[["Farina 0",350,"g"],["Caputo verde",150,"g"],["Lievito fresco",15,"g"],["Acqua",130,"g"],["Latte",150,"g"],["Burro morbido",50,"g"],["Sale",15,"g"],["Zucchero",10,"g"],["Uvetta",80,"g"]],
+    p:"30g a panino. Impastare. Lievitare. Spezzare. Lievitare e infornare.",
+    q:"≥ 25 panini gelo",ts:1700000011000},
+
+  {n:"Panini Base",c:"Panini",s:"panificazione",
+    i:[["Farina 00",500,"g"],["Farina per gusto",100,"g"],["Acqua",300,"g"],["Lievito fresco",20,"g"],["Olio",50,"g"],["Zucchero",5,"g"],["Sale",15,"g"],["Sugna",40,"g"],["Acqua (2°)",50,"g"]],
+    p:"Impastare 1 ora in lievitatore. Spezzare. Lievitare e infornare.",
+    q:"≥ 16 panini per gusto",ts:1700000012000},
+
+  {n:"Panini Croccanti",c:"Panini",s:"panificazione",
+    i:[["Farina",600,"g"],["Acqua",300,"g"],["Zucchero",20,"g"],["Malto",null,"q.b."],["Sugna",40,"g"],["Lievito fresco",20,"g"],["Olio",50,"g"],["Sale",15,"g"]],
+    p:"Impastare. Spezzare. Lievitare e infornare.",
+    k:["220° · Misto vapore · v3 · 5 min","180° · Convezione · v3 · 4 min"],
+    ts:1700000013000},
+
+  /* ─── PIZZA & FOCACCIA ─── */
+  {n:"Pizza Pala",c:"Pizza & Focaccia",s:"panificazione",
+    i:[["— Biga —",null,"§"],["Farina",1000,"g"],["Acqua",450,"g"],["Lievito fresco",10,"g"],["— Impasto finale —",null,"§"],["Malto",10,"g"],["Sale",20,"g"],["Licoli",300,"g"],["Acqua",350,"g"],["Olio",50,"g"],["Lievito fresco",10,"g"]],
+    p:"Biga: 1h T.A. + 23h frigo. Lievitare 1–2h in lievitatore. Spezzare 400g con piega a tre senza stringere. 1h lievitazione. Stendere · olio, origano, sale Maldon.",
+    k:["260° · Misto vapore · v4 · 6 min","+ 2 min · Valvola aperta"],
+    q:"≥ 10 al giorno · Pezzi 400g",ts:1700000003000},
+
+  {n:"Focaccia Pugliese",c:"Pizza & Focaccia",s:"panificazione",
+    i:[["— Autolisi —",null,"§"],["Semola",1000,"g"],["Acqua",600,"g"],["Miele o malto",10,"g"],["— Impasto finale —",null,"§"],["Lievito fresco",30,"g"],["Acqua (26–28°)",85,"g"],["Farina",85,"g"],["Sale",30,"g"],["Patate lesse",300,"g"],["Olio",40,"g"]],
+    p:"Autolisi: 2h. Finale: autolisi + farina + lievito + 1/3 acqua vel.1. Sale + 1/3 patate vel.2. Patate + 1/3 acqua + olio. Riposo 15 min. Spezzare in stampi 120–140g. 60 min. Condire + 1h lievitazione.",
+    k:["220° · 8–10 min"],
+    q:"≥ 15 pezzi al giorno · 20 focaccine buffet",ts:1700000014000},
+
+  /* ─── BIGA ─── */
+  {n:"Biga per Pane",c:"Biga",s:"panificazione",
+    i:[["— Biga —",null,"§"],["Farina",2200,"g"],["Acqua",1120,"g"],["Lievito fresco",26,"g"],["Malto",3,"g"],["— Autolisi —",null,"§"],["Farina semola",1000,"g"],["Farina bianca",500,"g"],["Acqua",1000,"g"],["— Impasto finale —",null,"§"],["Malto",5,"g"],["Sale",80,"g"],["Licoli",300,"g"],["Acqua",200,"g"]],
+    p:"Biga: 1h T.A. + 23h frigo. Autolisi: 1h. Unire biga + autolisi + finale. Pezzi da 450g.",
+    q:"≥ 10 baguette",ts:1700000002000},
+
+  {n:"Biga Baguette",c:"Biga",s:"panificazione",
+    i:[["— Biga —",null,"§"],["Farina",1400,"g"],["Acqua tiepida",630,"g"],["Lievito fresco",15,"g"],["— Autolisi —",null,"§"],["Farina bianca",300,"g"],["Farina semola",300,"g"],["Acqua",400,"g"],["— Impasto finale —",null,"§"],["Lievito fresco",10,"g"],["Malto",5,"g"],["Sale",40,"g"],["Olio",80,"g"],["Licoli",300,"g"],["Acqua",360,"g"]],
+    p:"Biga: 1h T.A. + 23h frigo (o 2h T.A. + 22h frigo). Autolisi 1h. Unire tutto. Lievitare 1h. Spezzare 450g · stendere piano piano.",
+    k:["240° · Misto vapore · v1 · 8 min","180° · Secco · v1 · 10 min","160° · Secco · v3 · 10 min","160° · Secco · v3 · Valvola aperta · 6 min"],
+    q:"Tot. impasto: 3215 / 6430 / 9645g",ts:1700000015000},
+
+  /* ─── LIEVITO MADRE ─── */
+  {n:"Pane Licoli",c:"Lievito Madre",s:"panificazione",
+    i:[["— Idrolisi —",null,"§"],["Farina mista",3000,"g"],["Acqua",2000,"g"],["— Impasto finale —",null,"§"],["Licoli",1000,"g"],["Sale",80,"g"],["Acqua fredda",250,"g"]],
+    p:"Rinfresco 1-1-1 a max 26°. Sciogliere licoli in acqua 26–28°. Idrolisi 30–60 min. Unire licoli + impastare. Aggiungere sale + acqua fredda. 4–5h lievitatore 26°. Spezzare · pirlare 15 min · chiusura a tre. Frigo 12–18h. 1h fuori prima di infornare · tagliare e spruzzare con acqua.",
+    k:["260° · Misto vapore 80% idro · v1 · 15 min","180° · Secco · v1 · 30 min","160° · Secco · v3 · 15 min · Valvola aperta"],
+    q:"≥ 16 pagnotte/giorno · 2 bianche · 2 integrali · Pagnotta 260–300g in stampo · Pezzo pane 700g",ts:1700000004000},
+
+  /* ─── ALTRO ─── */
+  {n:"Freselle",c:"Altro",s:"panificazione",
+    i:[["Farina bianca",750,"g"],["Farina integrale",250,"g"],["Sale",20,"g"],["Lievito fresco",30,"g"],["Licoli",600,"g"]],
+    p:"Impastare. Spezzare. Lievitare. Infornare. Tagliare a metà e biscottare.",
+    ts:1700000016000}
 ];
 
 /* ══════════════════════ STATE ══════════════════════ */
@@ -620,7 +696,11 @@ function loadRecipes(sec,silent){
   fbGet(sec).then(function(data){
     setDots('ok');recipes={};
     if(data&&typeof data==='object'){Object.keys(data).forEach(function(k){if(data[k])recipes[k]=data[k];});}
-    if(sec==='panificazione'&&Object.keys(recipes).length===0){seedSection(sec,SEED_PANI);return;}
+    if(Object.keys(recipes).length===0){
+      if(sec==='panificazione')seedSection(sec,SEED_PANI);
+      else{renderCats();renderGrid();}
+      return;
+    }
     renderCats();renderGrid();
   }).catch(function(){setDots('err');if(!silent)showEmpty('Errore connessione Firebase');});
 }
@@ -629,9 +709,8 @@ function seedSection(sec,data){
   setTimeout(function(){loadRecipes(sec);},1400);
 }
 function showSeed(sec){
-  if(sec==='panificazione'){
-    recipes={};SEED_PANI.forEach(function(r,i){recipes['seed_'+i]=r;});
-  }
+  recipes={};
+  if(sec==='panificazione')SEED_PANI.forEach(function(r,i){recipes['seed_'+i]=r;});
   renderCats();renderGrid();
 }
 function showEmpty(msg){
@@ -1012,7 +1091,11 @@ function boot(){
     qs('aiKey').value=k;qs('groqMsg').textContent='Chiave salvata ✓';qs('groqMsg').style.color='var(--g2)';setTimeout(function(){qs('groqMsg').textContent='';},2200);
   });
   /* preload FB URL e chiavi salvate */
-  if(FB_URL)qs('fbUrlAdm').value=FB_URL;
+  if(FB_URL){qs('fbUrlAdm').value=FB_URL;setDots('ok');}
+  /* mostra nota se hardcoded */
+  if(FIREBASE_HARDCODED){
+    var fbNote=qs('fbMsg');if(fbNote){fbNote.textContent='URL fisso nel codice — sempre attivo';fbNote.style.color='var(--g2)';}
+  }
   var gk;try{gk=localStorage.getItem('groq_key');}catch(e){}if(gk){qs('groqKey').value=gk;qs('aiKey').value=gk;}
 
   /* ── AUTO-SAVE su blur: chiave Groq nel modal AI ── */
@@ -1062,7 +1145,6 @@ function boot(){
       if(prev){prev.src=result;prev.style.display='block';}if(empty)empty.style.display='none';if(area)area.classList.add('has-img');
     };reader.readAsDataURL(file);
   });
-  if(FB_URL)setDots('ok');
 }
 var _booted=false;
 function safeboot(){if(_booted)return;_booted=true;boot();}
