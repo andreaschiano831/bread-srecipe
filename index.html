@@ -80,6 +80,12 @@ body.t-carta{--bg:#EDE4D0;--bg2:#E4D8C0;--bg3:#D8C8A8;--ink:#1E1810;--ink2:#3028
 @media(min-width:680px){.land-panels{flex-direction:row}}
 .panel{flex:1;position:relative;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;min-height:min(17vh,100px);transition:flex .42s cubic-bezier(.23,1,.32,1);-webkit-tap-highlight-color:transparent}
 @media(min-width:680px){.panel{min-height:52vh}.panel:hover{flex:1.6}}
+.panel[data-sec="__all__"]{min-height:0;flex:0 0 52px}
+@media(min-width:680px){.panel[data-sec="__all__"]{flex:0 0 80px;min-height:0}}
+.panel[data-sec="__all__"] .panel-body{padding:.8rem 1.4rem;display:flex;flex-direction:row;align-items:center;gap:1rem}
+.panel[data-sec="__all__"] .panel-num{margin:0;font-size:.6rem}
+.panel[data-sec="__all__"] .panel-title{font-size:1rem;margin:0}
+.panel[data-sec="__all__"] .panel-sub{display:none}
 .panel-bg{position:absolute;inset:0;transition:transform .42s cubic-bezier(.23,1,.32,1)}
 .panel:hover .panel-bg,.panel:active .panel-bg{transform:scale(1.04)}
 .panel[data-sec="panificazione"] .panel-bg{background:linear-gradient(150deg,#0C1408,#1E2E10,#2E4818)}
@@ -384,17 +390,14 @@ body.t-carta{--bg:#EDE4D0;--bg2:#E4D8C0;--bg3:#D8C8A8;--ink:#1E1810;--ink2:#3028
 /* ── FOTO PREVIEW DURANTE ANALISI ── */
 .ai-foto-sticky{display:none;width:100%;border-radius:12px;overflow:hidden;margin-bottom:.9rem;background:var(--bg2);border:1px solid var(--rim);position:relative;max-height:220px}
 /* ── CARD FOTO ── */
-.card-foto-wrap{border-top:1px solid var(--bg3);overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:max-height .35s cubic-bezier(.23,1,.32,1)}
-.card-foto-collapsed{max-height:52px}
-.card-foto-expanded{max-height:600px}
-.card-foto-thumb{width:100%;height:52px;object-fit:cover;display:block;transition:height .35s cubic-bezier(.23,1,.32,1),object-position .35s}
-.card-foto-full{width:100%;display:block;opacity:0;max-height:0;transition:opacity .3s,max-height .35s cubic-bezier(.23,1,.32,1);object-fit:contain;background:var(--bg2)}
-.card-foto-wrap.open .card-foto-thumb{height:0;max-height:0}
-.card-foto-wrap.open .card-foto-full{opacity:1;max-height:500px}
-.card-foto-bar{display:flex;align-items:center;gap:.5rem;padding:.3rem .75rem;background:var(--bg2);border-top:1px solid var(--bg3)}
+.card-foto-wrap{border-top:1px solid var(--bg3);overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card-foto-scan{width:100%;display:block;object-fit:contain;background:#0a0a0a;max-height:520px;transition:max-height .38s cubic-bezier(.23,1,.32,1)}
+.card-foto-wrap.collapsed .card-foto-scan{max-height:0}
+.card-foto-bar{display:flex;align-items:center;gap:.5rem;padding:.32rem .75rem;background:var(--bg2);border-top:1px solid var(--bg3)}
 .card-foto-bar-lbl{flex:1;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke2);font-family:'Cormorant SC',serif}
-.card-foto-bar-ico{font-size:.75rem;color:var(--smoke2);transition:transform .3s}
-.card-foto-wrap.open .card-foto-bar-ico{transform:rotate(180deg)}
+.card-foto-bar-ico{font-size:.75rem;color:var(--smoke2);transition:transform .28s}
+.card-foto-wrap.collapsed .card-foto-bar-ico{transform:rotate(180deg)}
+.card-foto-bar-zoom{font-size:.72rem;cursor:pointer;color:var(--smoke2);padding:.15rem .35rem;border-radius:4px;border:1px solid var(--cb);background:var(--ctrl);-webkit-tap-highlight-color:transparent;margin-left:.3rem}
 /* ── LIGHTBOX ── */
 .lightbox-bg{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;cursor:zoom-out}
 .lightbox-bg.on{display:flex}
@@ -499,6 +502,8 @@ body.t-carta{--bg:#EDE4D0;--bg2:#E4D8C0;--bg3:#D8C8A8;--ink:#1E1810;--ink2:#3028
       <div class="panel-body fd"><p class="panel-num fsc">04/05</p><p class="panel-title"><em>Gelateria</em></p><p class="panel-sub fsc">Gelati · Sorbetti · Granite · Semifreddi</p></div><div class="panel-arr">›</div></div>
     <div class="panel" data-sec="torte"><div class="panel-bg"></div><div class="panel-noise"></div>
       <div class="panel-body fd"><p class="panel-num fsc">05/05</p><p class="panel-title"><em>Torte</em></p><p class="panel-sub fsc">Mousse · Glasse · Creme · Semifreddi</p></div><div class="panel-arr">›</div></div>
+    <div class="panel" data-sec="__all__" style="flex:0 0 auto;min-height:0"><div class="panel-bg" style="background:linear-gradient(150deg,#101010,#1a1a1a,#222)"></div><div class="panel-noise"></div>
+      <div class="panel-body fd"><p class="panel-num fsc">∞</p><p class="panel-title"><em>Tutte</em> le ricette</p><p class="panel-sub fsc">Ricerca globale su tutte le sezioni</p></div><div class="panel-arr">›</div></div>
   </div>
 </div>
 
@@ -762,6 +767,9 @@ var FIREBASE_HARDCODED='https://pane-ef699-default-rtdb.firebaseio.com';
 var FB_URL=(function(){if(FIREBASE_HARDCODED)return FIREBASE_HARDCODED.replace(/\/$/,'');try{return localStorage.getItem('fb_url')||'';}catch(e){return '';}})();
 var THEMES=[{id:'t-verde',l:'Verde',c:'#4A7E55'},{id:'t-carta',l:'Carta',c:'#A08060'},{id:'t-ebano',l:'Ebano',c:'#2A2418'},{id:'t-bordeaux',l:'Bordeaux',c:'#6B1428'},{id:'t-ottanio',l:'Ottanio',c:'#105060'}];
 var SECTIONS={'panificazione':{label:'Panificazione',sub:'Pane · Lievitati · Pizza · Focaccia',cats:['Pane','Panini','Pizza & Focaccia','Lievito Madre','Biga','Focaccia','Senza Glutine','Altro'],accent:'#4A7E55'},'fine-dining':{label:'Fine Dining',sub:'Aperitivo · Antipasti · Primi · Secondi',cats:['Aperitivo','Antipasti','Primi','Secondi','Ganache','Cioccolatini','Altro'],accent:'#C9A84C'},'colazioni':{label:'Colazioni',sub:'Impasti · Creme · Lievitati · Pasticcini',cats:['Impasti','Paste','Creme','Lievitati','Torte','Pasticcini','Marmellate','Altro'],accent:'#8B6A3A'},'gelateria':{label:'Gelateria',sub:'Gelati · Sorbetti · Granite · Semifreddi',cats:['Gelati','Sorbetti','Granite','Semifreddi','Basi','Altro'],accent:'#5A98A8'},'torte':{label:'Torte',sub:'Mousse · Glasse · Creme · Semifreddi',cats:['Mousse','Creme','Glasse','Gelatine','Biscotti','Torte','Semifreddi','Altro'],accent:'#9A6090'}};
+/* sezione virtuale — non ha Firebase node proprio */
+SECTIONS['__all__']={label:'Tutte le ricette',sub:'Ricerca globale su tutte le sezioni',cats:[],accent:'#888888',virtual:true};
+
 var SEED_PANI=[
 {n:"Grissini",c:"Pane",s:"panificazione",i:[["Farina 00",500,"g"],["Farina 0",250,"g"],["Olio di oliva",200,"g"],["Acqua",350,"g"],["Sale",20,"g"],["Lievito fresco",15,"g"]],p:"Impastare non troppo. Lievitare 1–2 ore. Spezzare · riposo 30 min · infornare.",k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],q:"≥ 60 pz a sera",ts:1700000000000},
 {n:"Pane Celiaci",c:"Senza Glutine",s:"panificazione",i:[["Farina celiaca",1000,"g"],["Acqua",750,"g"],["Lievito fresco",30,"g"],["Sale",25,"g"],["Miele",20,"g"]],p:"Impastare. Lievitare. Spezzare quadrati. Lievitare e infornare.",q:"≥ 2 buste da 20 pz gelo",ts:1700000010000},
@@ -825,12 +833,79 @@ function fbGet(sec){return fetch(fbPath(sec)).then(function(r){return r.json();}
 function fbPost(sec,data){return fetch(fbPath(sec),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
 function fbPut(sec,id,data){return fetch(fbPath(sec,id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
 function fbDel(sec,id){return fetch(fbPath(sec,id),{method:'DELETE'});}
-function showLanding(){qs('landing').style.display='flex';qs('app').classList.remove('on');curSec=null;curCat='Tutte';toggleMultiMode(false);if(syncTimer){clearInterval(syncTimer);syncTimer=null;}document.documentElement.style.setProperty('--acc','var(--g2)');qs('fabWrap').style.display='none';
+function showLanding(){qs('landing').style.display='flex';qs('app').classList.remove('on');curSec=null;curCat='Tutte';toggleMultiMode(false);if(syncTimer){clearInterval(syncTimer);syncTimer=null;}document.documentElement.style.setProperty('--acc','var(--g2)');recipes={};qs('fabWrap').style.display='none';
   qs('recentiBtn').classList.remove('show');}
 function fillSecSelect(sel,cur){if(!sel)return;sel.innerHTML='';Object.keys(SECTIONS).forEach(function(sk){var o=document.createElement('option');o.value=sk;o.textContent=SECTIONS[sk].label;if(sk===cur)o.selected=true;sel.appendChild(o);});}
 function fillCatSelect(sel,sec){if(!sel)return;sel.innerHTML='';var cats=SECTIONS[sec]?SECTIONS[sec].cats:['Altro'];cats.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});}
-function openSection(sec){curSec=sec;curCat='Tutte';toggleMultiMode(false);var s=SECTIONS[sec];document.documentElement.style.setProperty('--acc',s.accent);qs('hdTitle').textContent=s.label;qs('hdSub').textContent=s.sub;fillSecSelect(qs('mSec'),sec);fillCatSelect(qs('mCat'),sec);fillSecSelect(qs('aiSec'),sec);fillCatSelect(qs('aiCat'),sec);qs('landing').style.display='none';qs('app').classList.add('on');qs('fabWrap').style.display=isAdmin?'flex':'none';
-  qs('recentiBtn').classList.add('show');dose=1;qs('dVal').value=1;qs('srch').value='';renderCats();loadRecipes(sec);if(syncTimer)clearInterval(syncTimer);syncTimer=setInterval(function(){if(curSec)loadRecipes(curSec,true);},45000);}
+function openSection(sec){
+  if(sec==='__all__'){openAllSection();return;}
+  curSec=sec;curCat='Tutte';toggleMultiMode(false);
+  var s=SECTIONS[sec];
+  document.documentElement.style.setProperty('--acc',s.accent);
+  qs('hdTitle').textContent=s.label;qs('hdSub').textContent=s.sub;
+  fillSecSelect(qs('mSec'),sec);fillCatSelect(qs('mCat'),sec);
+  fillSecSelect(qs('aiSec'),sec);fillCatSelect(qs('aiCat'),sec);
+  qs('landing').style.display='none';qs('app').classList.add('on');
+  qs('fabWrap').style.display=isAdmin?'flex':'none';
+  qs('recentiBtn').classList.add('show');
+  dose=1;qs('dVal').value=1;qs('srch').value='';
+  renderCats();loadRecipes(sec);
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=setInterval(function(){if(curSec&&curSec!=='__all__')loadRecipes(curSec,true);},45000);
+}
+function openAllSection(){
+  curSec='__all__';curCat='Tutte';toggleMultiMode(false);
+  document.documentElement.style.setProperty('--acc','#888888');
+  qs('hdTitle').textContent='Tutte le ricette';
+  qs('hdSub').textContent='Ricerca globale su tutte le sezioni';
+  fillSecSelect(qs('mSec'),'panificazione');fillCatSelect(qs('mCat'),'panificazione');
+  fillSecSelect(qs('aiSec'),'panificazione');fillCatSelect(qs('aiCat'),'panificazione');
+  qs('landing').style.display='none';qs('app').classList.add('on');
+  qs('fabWrap').style.display=isAdmin?'flex':'none';
+  qs('recentiBtn').classList.add('show');
+  dose=1;qs('dVal').value=1;qs('srch').value='';
+  if(!FB_URL){showEmpty('Configura Firebase per vedere tutte le ricette.');return;}
+  qs('grid').innerHTML='<div class="spin-wrap"><span class="spin"></span></div>';
+  setDots('loading');recipes={};
+  var allSecs=Object.keys(SECTIONS).filter(function(s){return s!=='__all__';});
+  var pending=allSecs.length;
+  allSecs.forEach(function(sec){
+    fetch(FB_URL+'/ricette/'+sec+'.json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data&&typeof data==='object'){
+        Object.keys(data).forEach(function(k){if(data[k])recipes[sec+'__'+k]=Object.assign({},data[k],{s:sec});});
+      }
+      pending--;if(pending===0){setDots('ok');buildIngDatalist();renderCatsAll();renderGrid();}
+    }).catch(function(){pending--;if(pending===0){setDots('err');renderCatsAll();renderGrid();}});
+  });
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=setInterval(function(){if(curSec==='__all__')openAllSection();},60000);
+}
+function renderCatsAll(){
+  updatePiattiDatalist();
+  var bar=qs('catBar');if(!bar)return;bar.innerHTML='';
+  var cats=['Tutte'];
+  Object.values(recipes).forEach(function(r){if(r&&r.c&&cats.indexOf(r.c)===-1)cats.push(r.c);});
+  cats.forEach(function(cat){
+    var b=el('button','cpill'+(cat===curCat?' cpill-on':''));
+    b.textContent=cat;b.type='button';
+    b.addEventListener('click',function(){curCat=cat;renderCatsAll();renderGrid();});
+    bar.appendChild(b);
+  });
+  // filtri per sezione
+  var sep=el('span');sep.style.cssText='color:var(--smoke3);font-size:.65rem;padding:0 .25rem;display:flex;align-items:center;flex-shrink:0';sep.textContent='|';
+  bar.appendChild(sep);
+  Object.keys(SECTIONS).filter(function(s){return s!=='__all__';}).forEach(function(sk){
+    var tag='S:'+sk;
+    var b2=el('button','cpill'+(curCat===tag?' cpill-on':''));
+    b2.style.cssText='background:var(--glow);border-color:var(--rim)';
+    b2.textContent=SECTIONS[sk].label;b2.type='button';
+    b2.addEventListener('click',function(){curCat=tag;renderCatsAll();renderGrid();});
+    bar.appendChild(b2);
+  });
+}
+
 function loadRecipes(sec,silent){if(!FB_URL){recipes={};showSeed(sec);return;}if(!silent){qs('grid').innerHTML='<div class="spin-wrap"><span class="spin"></span></div>';setDots('loading');}fbGet(sec).then(function(data){setDots('ok');recipes={};if(data&&typeof data==='object'){Object.keys(data).forEach(function(k){if(data[k])recipes[k]=data[k];});}if(sec==='panificazione'&&Object.keys(recipes).length===0){seedSection(sec,SEED_PANI);return;}buildIngDatalist();renderCats();renderGrid();}).catch(function(){setDots('err');if(!silent)showEmpty('Errore connessione Firebase');});}
 function seedSection(sec,data){data.forEach(function(r){fbPost(sec,r);});setTimeout(function(){loadRecipes(sec);},1600);}
 function showSeed(sec){recipes={};if(sec==='panificazione')SEED_PANI.forEach(function(r,i){recipes['seed_'+i]=r;});buildIngDatalist();renderCats();renderGrid();}
@@ -838,8 +913,19 @@ function showEmpty(msg){var g=qs('grid');g.innerHTML='';var em=el('div','empty')
 function buildIngDatalist(){var dl=qs('ing-datalist');if(!dl)return;var names={};Object.values(recipes).forEach(function(r){if(!r||!r.i)return;r.i.forEach(function(x){var nm=Array.isArray(x)?x[0]:(x.n||'');if(nm&&nm.trim().length>1&&nm!==nm.toUpperCase())names[nm.trim()]=1;});});dl.innerHTML='';Object.keys(names).sort().forEach(function(n){var o=document.createElement('option');o.value=n;dl.appendChild(o);});}
 function updatePiattiDatalist(){var dl=qs('piatti-datalist');if(!dl)return;var piatti={};Object.values(recipes).forEach(function(r){if(r&&r.piatto&&r.piatto.trim())piatti[r.piatto.trim()]=1;});dl.innerHTML='';Object.keys(piatti).sort().forEach(function(p){var o=document.createElement('option');o.value=p;dl.appendChild(o);});}
 function renderCats(){updatePiattiDatalist();var bar=qs('catBar');if(!bar)return;bar.innerHTML='';var all=Object.values(recipes),cats=['Tutte'];all.forEach(function(r){if(r&&r.c&&cats.indexOf(r.c)===-1)cats.push(r.c);});var piattiSet={};all.forEach(function(r){if(r&&r.piatto&&r.piatto.trim())piattiSet[r.piatto.trim()]=true;});Object.keys(piattiSet).sort(function(a,b){return a.localeCompare(b,'it');}).forEach(function(p){cats.push('P:'+p);});cats.forEach(function(c){var isP=c.indexOf('P:')===0;var b=el('button','cpill'+(c===curCat?' cpill-on':'')+(isP?' cpill-piatto':''));b.textContent=isP?'🍽️ '+c.slice(2):c;b.type='button';b.addEventListener('click',function(){curCat=c;renderCats();renderGrid();});bar.appendChild(b);});}
-function renderGrid(){var grid=qs('grid');if(!grid)return;grid.innerHTML='';var q=((qs('srch')||{}).value||'').toLowerCase().trim();var allK=Object.keys(recipes),out=[];allK.forEach(function(k){var r=recipes[k];if(!r)return;var inCat=curCat==='Tutte'||r.c===curCat||(curCat.indexOf('P:')===0&&r.piatto&&r.piatto.trim()===curCat.slice(2));var inQ=!q||(r.n||'').toLowerCase().indexOf(q)!==-1;if(inCat&&inQ)out.push({id:k,r:r});});out.sort(function(a,b){if(sortMode==='az')return(a.r.n||'').localeCompare(b.r.n||'','it');if(sortMode==='za')return(b.r.n||'').localeCompare(a.r.n||'','it');if(sortMode==='new')return(b.r.ts||0)-(a.r.ts||0);if(sortMode==='old')return(a.r.ts||0)-(b.r.ts||0);return 0;});var cntEl=qs('cnt');if(cntEl)cntEl.textContent=out.length+' / '+allK.length+' ricette';if(!out.length){showEmpty();return;}var hasPiatti=out.some(function(x){return x.r.piatto&&x.r.piatto.trim();});if(hasPiatti&&!q&&curCat==='Tutte'){var grouped={},order=[];out.forEach(function(x){var key=x.r.piatto||'__none__';if(!grouped[key]){grouped[key]=[];order.push(key);}grouped[key].push(x);});var gi=0;order.forEach(function(key){if(order.length>1||key!=='__none__'){var hd2=el('div','piatto-group-hd');var lb=el('span','piatto-group-lbl');lb.textContent=(key==='__none__')?'Senza gruppo':key;var c2=el('span','piatto-group-cnt');c2.textContent=' — '+grouped[key].length+' ricett'+(grouped[key].length===1?'a':'e');hd2.appendChild(lb);hd2.appendChild(c2);grid.appendChild(hd2);}grouped[key].forEach(function(x){grid.appendChild(buildCard(x.r,x.id,gi++));});});}else{out.forEach(function(x,j){grid.appendChild(buildCard(x.r,x.id,j));});}}
-function buildCard(r,id,idx){var card=el('div','card');card.style.animationDelay=(idx*0.035)+'s';card.appendChild(el('div','card-stripe'));var hd=el('div','card-hd');var meta=el('div','card-meta');var num=el('span','card-num fsc');num.textContent='#'+(idx<9?'0':'')+(idx+1);meta.appendChild(num);if(r.c){var ct=el('span','card-cat fsc');ct.textContent=r.c;meta.appendChild(ct);}if(r.piatto){var pt=el('span','card-piatto fsc');pt.textContent='🍽️ '+r.piatto;meta.appendChild(pt);}var nm=el('div','card-name fd');nm.textContent=r.n;hd.appendChild(meta);hd.appendChild(nm);var acts=el('div','card-acts');
+function renderGrid(){var grid=qs('grid');if(!grid)return;grid.innerHTML='';var q=((qs('srch')||{}).value||'').toLowerCase().trim();var allK=Object.keys(recipes),out=[];allK.forEach(function(k){var r=recipes[k];if(!r)return;
+  var inCat=curCat==='Tutte'
+    ||r.c===curCat
+    ||(curCat.indexOf('P:')===0&&r.piatto&&r.piatto.trim()===curCat.slice(2))
+    ||(curCat.indexOf('S:')===0&&(r.s||r._sec)===curCat.slice(2));
+  var inQ=!q||(r.n||'').toLowerCase().indexOf(q)!==-1;
+  if(inCat&&inQ)out.push({id:k,r:r});});out.sort(function(a,b){if(sortMode==='az')return(a.r.n||'').localeCompare(b.r.n||'','it');if(sortMode==='za')return(b.r.n||'').localeCompare(a.r.n||'','it');if(sortMode==='new')return(b.r.ts||0)-(a.r.ts||0);if(sortMode==='old')return(a.r.ts||0)-(b.r.ts||0);return 0;});var cntEl=qs('cnt');if(cntEl)cntEl.textContent=out.length+' / '+allK.length+' ricette';
+  if(!out.length){showEmpty();return;}
+  // Aggiorna cat bar secondo la modalità
+  if(curSec==='__all__')renderCatsAll();
+  var hasPiatti=out.some(function(x){return x.r.piatto&&x.r.piatto.trim();});if(hasPiatti&&!q&&curCat==='Tutte'){var grouped={},order=[];out.forEach(function(x){var key=x.r.piatto||'__none__';if(!grouped[key]){grouped[key]=[];order.push(key);}grouped[key].push(x);});var gi=0;order.forEach(function(key){if(order.length>1||key!=='__none__'){var hd2=el('div','piatto-group-hd');var lb=el('span','piatto-group-lbl');lb.textContent=(key==='__none__')?'Senza gruppo':key;var c2=el('span','piatto-group-cnt');c2.textContent=' — '+grouped[key].length+' ricett'+(grouped[key].length===1?'a':'e');hd2.appendChild(lb);hd2.appendChild(c2);grid.appendChild(hd2);}grouped[key].forEach(function(x){grid.appendChild(buildCard(x.r,x.id,gi++));});});}else{out.forEach(function(x,j){grid.appendChild(buildCard(x.r,x.id,j));});}}
+function buildCard(r,id,idx){var card=el('div','card');card.style.animationDelay=(idx*0.035)+'s';card.appendChild(el('div','card-stripe'));var hd=el('div','card-hd');var meta=el('div','card-meta');var num=el('span','card-num fsc');num.textContent='#'+(idx<9?'0':'')+(idx+1);meta.appendChild(num);if(curSec==='__all__'&&(r.s||r._sec)){var sKey=r.s||r._sec;var bs=el('span','card-cat fsc');bs.textContent=SECTIONS[sKey]?SECTIONS[sKey].label:sKey;bs.style.cssText='background:rgba(136,136,136,.1);border-color:rgba(136,136,136,.25);color:var(--smoke2)';meta.appendChild(bs);}
+if(r.c){var ct=el('span','card-cat fsc');ct.textContent=r.c;meta.appendChild(ct);}if(r.piatto){var pt=el('span','card-piatto fsc');pt.textContent='🍽️ '+r.piatto;meta.appendChild(pt);}var nm=el('div','card-name fd');nm.textContent=r.n;hd.appendChild(meta);hd.appendChild(nm);var acts=el('div','card-acts');
 var cb2=el('button','act-btn');cb2.type='button';cb2.title='Cucina';cb2.textContent='🍳';
 cb2.addEventListener('click',function(e){e.stopPropagation();openCucina(r);});acts.appendChild(cb2);
 if(isAdmin){
@@ -851,7 +937,7 @@ if(isAdmin){
   var mv=el('button','act-btn');mv.type='button';mv.title='Sposta';mv.textContent='↗';
   mv.addEventListener('click',function(e){e.stopPropagation();openMoveModal(id,r);});acts.appendChild(mv);
   var db=el('button','act-btn act-btn-del');db.type='button';db.title='Elimina';db.textContent='🗑️';
-  db.addEventListener('click',function(e){e.stopPropagation();openCfm('Eliminare "'+r.n+'"?',function(){doDelete(id,r.s||curSec);});});acts.appendChild(db);var pressT;card.addEventListener('touchstart',function(){pressT=setTimeout(function(){if(isAdmin)toggleSelCard(id,r,card);},600);},{passive:true});card.addEventListener('touchend',function(){clearTimeout(pressT);});card.addEventListener('mousedown',function(){pressT=setTimeout(function(){if(isAdmin)toggleSelCard(id,r,card);},600);});card.addEventListener('mouseup',function(){clearTimeout(pressT);});}hd.appendChild(acts);card.appendChild(hd);
+  db.addEventListener('click',function(e){e.stopPropagation();openCfm('Eliminare "'+r.n+'"?',function(){doDelete(id,r.s||r._sec||curSec);});});acts.appendChild(db);var pressT;card.addEventListener('touchstart',function(){pressT=setTimeout(function(){if(isAdmin)toggleSelCard(id,r,card);},600);},{passive:true});card.addEventListener('touchend',function(){clearTimeout(pressT);});card.addEventListener('mousedown',function(){pressT=setTimeout(function(){if(isAdmin)toggleSelCard(id,r,card);},600);});card.addEventListener('mouseup',function(){clearTimeout(pressT);});}hd.appendChild(acts);card.appendChild(hd);
 if(r.i&&r.i.length){var dl=(dose===Math.floor(dose))?String(dose):dose.toFixed(1);var tbl=el('table','tbl');var thead=el('thead');var tr0=el('tr');['Ingrediente','Base','','×'+dl].forEach(function(h,i){var th=el('th');th.textContent=h;if(i===1)th.className='r';if(i===3)th.className='sc';tr0.appendChild(th);});thead.appendChild(tr0);tbl.appendChild(thead);var tb=el('tbody');r.i.forEach(function(ing){var tr=el('tr');if(ing[2]==='§'){tr.className='tr-sec';var td=el('td');td.setAttribute('colspan','4');td.textContent=ing[0];tr.appendChild(td);}else{var tN=el('td');tN.textContent=ing[0];var tB=el('td','td-r');tB.textContent=fmtN(ing[1]);var tU=el('td');tU.textContent=ing[2];var tS=el('td','td-sc');tS.setAttribute('data-b',ing[1]===null?'':ing[1]);tS.setAttribute('data-u',ing[2]);tS.textContent=fmtD(ing[1],dose)+(ing[1]!==null?' '+ing[2]:'');tr.appendChild(tN);tr.appendChild(tB);tr.appendChild(tU);tr.appendChild(tS);}tb.appendChild(tr);});tbl.appendChild(tb);card.appendChild(tbl);}
 if(r.p){
   var ps=el('div','proc-sec');
@@ -869,27 +955,29 @@ if(r.p){
 }
 if(r.k&&r.k.length){var cs=el('div','cott-sec');var cl=el('div','sec-lbl fsc');cl.textContent='Cottura';cs.appendChild(cl);var cc=el('div','cott-list');r.k.forEach(function(kk){var ch=el('div','cott-chip');var arr=document.createElementNS('http://www.w3.org/2000/svg','svg');arr.setAttribute('viewBox','0 0 16 16');arr.setAttribute('fill','none');arr.setAttribute('class','cott-arr');var poly=document.createElementNS('http://www.w3.org/2000/svg','polyline');poly.setAttribute('points','4,4 10,8 4,12');poly.setAttribute('stroke','currentColor');poly.setAttribute('stroke-width','1.8');poly.setAttribute('stroke-linecap','round');arr.appendChild(poly);ch.appendChild(arr);ch.appendChild(document.createTextNode(kk));cc.appendChild(ch);});cs.appendChild(cc);card.appendChild(cs);}
 if(r.q){var tg=el('div','target-bar');var tdot=el('span','target-dot');tg.appendChild(tdot);tg.appendChild(document.createTextNode(r.q));card.appendChild(tg);}
-  // Foto ricetta — espansione inline
+  // Foto ricetta — sempre visibile come scan, click barra = collassa/espande
   if(r.img&&r.img.b64){
     var src='data:'+r.img.mime+';base64,'+r.img.b64;
-    var fw=el('div','card-foto-wrap card-foto-collapsed');
-    // thumbnail strip
-    var fThumb=el('img','card-foto-thumb');fThumb.src=src;fThumb.alt=r.n;fThumb.loading='lazy';
-    // immagine full
-    var fFull=el('img','card-foto-full');fFull.src=src;fFull.alt=r.n;fFull.loading='lazy';
-    // barra inferiore
+    var fw=el('div','card-foto-wrap'); // aperto di default
+    var fScan=el('img','card-foto-scan');
+    fScan.src=src;fScan.alt=r.n;fScan.loading='lazy';
+    // barra con label + icona collassa + zoom
     var fBar=el('div','card-foto-bar');
-    var fLbl=el('span','card-foto-bar-lbl');fLbl.textContent='Foto ricetta';
-    var fIco=el('span','card-foto-bar-ico');fIco.textContent='▾';
-    fBar.appendChild(fLbl);fBar.appendChild(fIco);
-    fw.appendChild(fThumb);fw.appendChild(fFull);fw.appendChild(fBar);
-    fw.addEventListener('click',function(e){
+    var fLbl=el('span','card-foto-bar-lbl');fLbl.textContent='📷 Scan ricetta';
+    var fIco=el('span','card-foto-bar-ico');fIco.textContent='▲';
+    var fZoom=el('button','card-foto-bar-zoom');fZoom.type='button';fZoom.textContent='🔍';fZoom.title='Ingrandisci';
+    fBar.appendChild(fLbl);fBar.appendChild(fIco);fBar.appendChild(fZoom);
+    fw.appendChild(fScan);fw.appendChild(fBar);
+    // click barra → collassa/espande
+    fBar.addEventListener('click',function(e){
       e.stopPropagation();
-      var open=fw.classList.contains('open');
-      fw.classList.toggle('open',!open);
-      fw.classList.toggle('card-foto-collapsed',open);
-      fw.classList.toggle('card-foto-expanded',!open);
+      var col=fw.classList.toggle('collapsed');
+      fIco.textContent=col?'▼':'▲';
     });
+    // click zoom → lightbox
+    fZoom.addEventListener('click',function(e){e.stopPropagation();openLightbox(src);});
+    // click sull'immagine → lightbox
+    fScan.addEventListener('click',function(e){e.stopPropagation();openLightbox(src);});
     card.appendChild(fw);
   }
   return card;}
@@ -955,7 +1043,7 @@ function closeCfm(){qs('cfmBg').classList.remove('on');_delCfmFn=null;}
 function doDelete(id,sec){if(!id||!FB_URL)return;setDots('loading');fbDel(sec||curSec,id).then(function(){delete recipes[id];buildIngDatalist();renderCats();renderGrid();setDots('ok');}).catch(function(){setDots('err');alert('Errore eliminazione.');});}
 function openMoveModal(id,r){_moveId=id;_moveRec=r;var origSec=r.s||curSec||'panificazione';var box=qs('moveBox');box.innerHTML='';var h=el('h4','fd');h.textContent='Sposta ricetta';box.appendChild(h);var p=el('p','fsc');p.textContent='"'+r.n+'" → sezione destinazione';box.appendChild(p);var opts=el('div','move-opts');Object.keys(SECTIONS).forEach(function(sk){if(sk===origSec)return;var btn=el('button','move-opt fd');btn.type='button';btn.textContent=SECTIONS[sk].label;btn.addEventListener('click',function(){doMoveRec(id,r,sk);});opts.appendChild(btn);});box.appendChild(opts);var canc=el('button','move-cancel fs');canc.type='button';canc.textContent='Annulla';canc.addEventListener('click',closeMove);box.appendChild(canc);qs('moveBg').classList.add('on');}
 function closeMove(){qs('moveBg').classList.remove('on');_moveId=null;_moveRec=null;}
-function doMoveRec(id,r,destSec){var origSec=r.s||curSec;var rec=Object.assign({},r,{s:destSec,ts:Date.now()});setDots('loading');fbPost(destSec,rec).then(function(result){if(result&&result.name){fbDel(origSec,id).then(function(){delete recipes[id];setDots('ok');buildIngDatalist();renderCats();renderGrid();closeMove();});}}).catch(function(){setDots('err');alert('Errore spostamento.');});}
+function doMoveRec(id,r,destSec){var origSec=r.s||r._sec||curSec;var rec=Object.assign({},r,{s:destSec,ts:Date.now()});setDots('loading');fbPost(destSec,rec).then(function(result){if(result&&result.name){fbDel(origSec,id).then(function(){delete recipes[id];setDots('ok');buildIngDatalist();renderCats();renderGrid();closeMove();});}}).catch(function(){setDots('err');alert('Errore spostamento.');});}
 function toggleMultiMode(on){_multiMode=on;if(!on)_multiSel=[];var bar=qs('multiBar');if(bar)bar.classList.toggle('on',on);if(!on)document.querySelectorAll('.card.multi-sel').forEach(function(c){c.classList.remove('multi-sel');});}
 function updateMultiBar(){var c=qs('multiCnt');if(c)c.textContent=_multiSel.length;}
 function toggleSelCard(id,r,cardEl){var idx=_multiSel.findIndex(function(x){return x.id===id;});if(idx===-1){_multiSel.push({id:id,r:r});cardEl.classList.add('multi-sel');toggleMultiMode(true);}else{_multiSel.splice(idx,1);cardEl.classList.remove('multi-sel');}updateMultiBar();if(_multiSel.length===0)toggleMultiMode(false);}
