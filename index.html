@@ -866,8 +866,8 @@ function submitPwd(){
 /* ══════════════════════ FIREBASE ══════════════════════ */
 function fbPath(sec,id){var b=FB_URL+'/ricette/'+sec;return id?b+'/'+id+'.json':b+'.json';}
 function fbGet(sec){return fetch(fbPath(sec)).then(function(r){return r.json();});}
-function fbPost(sec,data){return fetch(fbPath(sec),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
-function fbPut(sec,id,data){return fetch(fbPath(sec,id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
+function fbPost(sec,data){return fetch(fbPath(sec),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){if(!r.ok)throw new Error('Firebase HTTP '+r.status+' '+r.statusText);return r.json();});}
+function fbPut(sec,id,data){return fetch(fbPath(sec,id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){if(!r.ok)throw new Error('Firebase HTTP '+r.status+' '+r.statusText);return r.json();});}
 function fbDel(sec,id){return fetch(fbPath(sec,id),{method:'DELETE'});}
 
 /* ══════════════════════ NAVIGATION ══════════════════════ */
@@ -1113,18 +1113,26 @@ function doSave(){
       if(sec!==origSec){
         fbPost(sec,finalRec).then(function(res){
           if(res&&res.name){fbDel(origSec,_editId).then(function(){delete recipes[_editId];if(sec===curSec)recipes[res.name]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();});}
-        }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+        }).catch(function(){setDots('err');var _em=arguments[0]&&arguments[0].message?': '+arguments[0].message:'';alert('Errore salvataggio Firebase'+_em+'. Controlla la connessione e le regole Firebase.');});
       } else {
-        fbPut(sec,_editId,finalRec).then(function(){recipes[_editId]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();}).catch(function(){setDots('err');alert('Errore salvataggio.');});
+        fbPut(sec,_editId,finalRec).then(function(){recipes[_editId]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();}).catch(function(){setDots('err');var _em=arguments[0]&&arguments[0].message?': '+arguments[0].message:'';alert('Errore salvataggio Firebase'+_em+'. Controlla la connessione e le regole Firebase.');});
       }
     } else {
       fbPost(sec,finalRec).then(function(res){
         if(res&&res.name){if(sec===curSec)recipes[res.name]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();}
-      }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+      }).catch(function(e){setDots('err');var msg='Errore salvataggio';if(e&&e.message)msg+=': '+e.message;alert(msg);});
     }
   }
   if(_mFotoB64){
-    compressImg(_mFotoB64,'image/jpeg',700,0.65,function(cb64,cmime){rec.img={b64:cb64,mime:cmime};_persist(rec);});
+    compressImg(_mFotoB64,'image/jpeg',480,0.45,function(cb64,cmime){
+    // Size check: base64 string > 700KB → warn and save without foto
+    if(cb64.length > 700000){
+      alert('Foto troppo grande anche dopo compressione ('+Math.round(cb64.length/1024)+'KB). Usa una foto più piccola o a risoluzione inferiore.');
+      _persist(rec); // save without foto
+      return;
+    }
+    rec.img={b64:cb64,mime:cmime};_persist(rec);
+  });
   } else {
     _persist(rec);
   }
@@ -1226,7 +1234,7 @@ function saveAiRecipe(){
   setDots('loading');
   fbPost(sec,rec).then(function(result){
     if(result&&result.name){if(sec===curSec){recipes[result.name]=rec;renderCats();renderGrid();}setDots('ok');closeAiModal();}
-  }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+  }).catch(function(){setDots('err');var _em=arguments[0]&&arguments[0].message?': '+arguments[0].message:'';alert('Errore salvataggio Firebase'+_em+'. Controlla la connessione e le regole Firebase.');});
 }
 
 /* ══════════════════════ BOOT ══════════════════════ */
@@ -1446,6 +1454,11 @@ function boot(){
   var mff=document.getElementById('mFotoFile');
   if(mff)mff.addEventListener('change',function(){
     var file=this.files[0];if(!file)return;
+    // Warn if file is very large (>8MB)
+    if(file.size>8*1024*1024){
+      alert('Foto troppo grande ('+Math.round(file.size/1024/1024,1)+'MB). Usa una foto più piccola, idealmente sotto 5MB.');
+      return;
+    }
     var reader=new FileReader();
     reader.onload=function(ev){
       _mFotoB64=ev.target.result.split(',')[1];
@@ -1585,7 +1598,30 @@ function renderRecenti(allRecs){
 
 /* ══ FOTO CARD ══ */
 function compressImg(b64,mime,maxPx,quality,cb){
-  try{var img=new Image();img.onload=function(){var w=img.width,h=img.height,scale=Math.min(1,Math.min(maxPx/w,maxPx/h));var nw=Math.round(w*scale),nh=Math.round(h*scale);var canvas=document.createElement('canvas');canvas.width=nw;canvas.height=nh;canvas.getContext('2d').drawImage(img,0,0,nw,nh);var out=canvas.toDataURL('image/jpeg',quality);cb(out.split(',')[1],'image/jpeg');};img.onerror=function(){cb(b64,mime);};img.src='data:'+mime+';base64,'+b64;}catch(e){cb(b64,mime);}
+  try{
+    var img=new Image();
+    img.onload=function(){
+      var w=img.width,h=img.height;
+      var scale=Math.min(1,Math.min(maxPx/w,maxPx/h));
+      var nw=Math.max(1,Math.round(w*scale)),nh=Math.max(1,Math.round(h*scale));
+      var canvas=document.createElement('canvas');
+      canvas.width=nw;canvas.height=nh;
+      canvas.getContext('2d').drawImage(img,0,0,nw,nh);
+      var out=canvas.toDataURL('image/jpeg',quality);
+      var result=out.split(',')[1];
+      // If still too big, compress again at smaller size
+      if(result.length>600000){
+        var scale2=Math.min(maxPx*0.6/nw,maxPx*0.6/nh,1);
+        var nw2=Math.max(1,Math.round(nw*scale2)),nh2=Math.max(1,Math.round(nh*scale2));
+        var c2=document.createElement('canvas');c2.width=nw2;c2.height=nh2;
+        c2.getContext('2d').drawImage(canvas,0,0,nw2,nh2);
+        result=c2.toDataURL('image/jpeg',0.35).split(',')[1];
+      }
+      cb(result,'image/jpeg');
+    };
+    img.onerror=function(){cb(b64,mime);};
+    img.src='data:'+mime+';base64,'+b64;
+  }catch(e){cb(b64,mime);}
 }
 function openLightbox(src){var lb=document.getElementById('lightboxBg'),li=document.getElementById('lightboxImg');if(!lb||!li)return;li.src=src;lb.classList.add('on');}
 function closeLightbox(){var lb=document.getElementById('lightboxBg');if(lb)lb.classList.remove('on');}
