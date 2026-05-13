@@ -346,11 +346,13 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
 .ai-foto-sticky.on{display:block}
 .ai-foto-sticky img{width:100%;max-height:220px;object-fit:contain;display:block;background:var(--bg2)}
 .ai-photo-grid{display:none;flex-wrap:wrap;gap:.5rem;margin-top:.65rem}
-.modal-foto-area{border:2px dashed var(--cb);border-radius:10px;overflow:hidden;margin-top:.25rem;cursor:pointer;background:var(--ctrl);position:relative;min-height:70px;display:flex;align-items:center;justify-content:center}
-.modal-foto-area.has-foto{border-style:solid;border-color:var(--g2);padding:0}
-.modal-foto-lbl{font-size:.66rem;color:var(--smoke2);padding:.8rem 1rem;text-align:center}
-.modal-foto-preview{width:100%;max-height:160px;object-fit:cover;display:none}
-.modal-foto-rm{position:absolute;top:.4rem;right:.4rem;background:rgba(0,0,0,.55);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:.8rem;display:none;align-items:center;justify-content:center;z-index:2}
+.modal-foto-area{border:2px dashed var(--cb);border-radius:10px;overflow:hidden;margin-top:.25rem;cursor:pointer;background:var(--ctrl);position:relative;min-height:80px;display:flex;align-items:center;justify-content:center}
+.modal-foto-area.has-foto{border-style:solid;border-color:var(--g2);padding:0;cursor:default}
+.modal-foto-area.has-foto input[type=file]{display:none!important}
+.modal-foto-lbl{font-size:.66rem;color:var(--smoke2);padding:1rem 1rem;text-align:center;pointer-events:none;position:relative;z-index:0}
+.modal-foto-lbl-ico{font-size:1.4rem;display:block;margin-bottom:.3rem;opacity:.4}
+.modal-foto-preview{width:100%;max-height:200px;object-fit:cover;display:none;cursor:zoom-in}
+.modal-foto-rm{position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem;display:none;align-items:center;justify-content:center;z-index:3;line-height:1}
 .modal-foto-area.has-foto .modal-foto-preview{display:block}
 .modal-foto-area.has-foto .modal-foto-rm{display:flex}
 .modal-foto-area.has-foto .modal-foto-lbl{display:none}
@@ -504,10 +506,10 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
     <input type="text" id="mTarget" class="fs" placeholder="Es. ≥ 60 pz a sera">
     <label style="display:block;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke);margin:.75rem 0 .2rem">Foto ricetta <span style="opacity:.4;font-weight:300">(opzionale)</span></label>
     <div class="modal-foto-area" id="mFotoArea">
-      <input type="file" id="mFotoFile" accept="image/*" style="display:none">
-      <div class="modal-foto-lbl" id="mFotoAddLbl">📷 Tocca per aggiungere una foto</div>
+      <input type="file" id="mFotoFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1">
+      <div class="modal-foto-lbl" id="mFotoAddLbl"><span class="modal-foto-lbl-ico">📷</span>Tocca per aggiungere una foto</div>
       <img class="modal-foto-preview" id="mFotoPreview" alt="">
-      <button class="modal-foto-rm" id="mFotoRm" type="button">&#215;</button>
+      <button class="modal-foto-rm" id="mFotoRm" type="button" style="z-index:2">&#215;</button>
     </div>
     <button type="button" id="mFotoChangBtn" style="display:none;margin-top:.3rem;background:none;border:1px solid var(--cb);border-radius:6px;padding:.28rem .65rem;font-size:.62rem;color:var(--smoke);cursor:pointer">Cambia foto</button>
     <div class="modal-btns">
@@ -1559,13 +1561,17 @@ document.addEventListener('DOMContentLoaded',function(){
     reader.onload=function(ev){
       _mFotoB64=ev.target.result.split(',')[1];
       var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
+      fa&&fa.classList.add('has-foto'); // ensure has-foto is set first
       if(fp)fp.src=ev.target.result;if(fa)fa.classList.add('has-foto');
       if(lbl)lbl.style.display='none';if(btn)btn.style.display='inline-block';
     };reader.readAsDataURL(file);this.value='';
   });
-  if(mfa)mfa.addEventListener('click',function(){
-    if(this.classList.contains('has-foto')){var fp=document.getElementById('mFotoPreview');if(fp&&fp.src)openLightbox(fp.src);}
-    else{if(mff)mff.click();}
+  if(mfa)// File input now overlays the area directly - no need for mff.click()
+  // But intercept clicks on the preview image to open lightbox instead of file picker
+  var mfp2=document.getElementById('mFotoPreview');
+  if(mfp2)mfp2.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(this.src&&this.src!==window.location.href)openLightbox(this.src);
   });
   var mfr=document.getElementById('mFotoRm');
   if(mfr)mfr.addEventListener('click',function(e){
@@ -1573,7 +1579,15 @@ document.addEventListener('DOMContentLoaded',function(){
     var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
     if(fp)fp.src='';if(fa)fa.classList.remove('has-foto');if(lbl)lbl.style.display='';if(btn)btn.style.display='none';
   });
-  var mfcb=document.getElementById('mFotoChangBtn');if(mfcb)mfcb.addEventListener('click',function(e){e.stopPropagation();if(mff)mff.click();});
+  var mfcb=document.getElementById('mFotoChangBtn');
+  if(mfcb)mfcb.addEventListener('click',function(e){
+    e.stopPropagation();
+    // Reset has-foto so the file input overlay becomes active again
+    var fa2=document.getElementById('mFotoArea');
+    if(fa2)fa2.classList.remove('has-foto');
+    // We'll re-add has-foto when file is selected
+    if(mff)mff.click();
+  });
   // Cucina foto
   var cfw=document.getElementById('cucinaFotoWrap');
   if(cfw)cfw.addEventListener('click',function(){var img=document.getElementById('cucinaFotoImg');if(img&&img.src)openLightbox(img.src);});
