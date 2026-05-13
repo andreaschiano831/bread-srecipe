@@ -502,6 +502,14 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
     <button class="add-ing-btn fs" id="addIngBtn" type="button">+ Ingrediente</button>
     <label class="fsc">Target / Note <span style="opacity:.45;font-weight:300">(facoltativo)</span></label>
     <input type="text" id="mTarget" class="fs" placeholder="Es. ≥ 60 pz a sera">
+    <label style="display:block;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke);margin:.75rem 0 .2rem">Foto ricetta <span style="opacity:.4;font-weight:300">(opzionale)</span></label>
+    <div class="modal-foto-area" id="mFotoArea">
+      <input type="file" id="mFotoFile" accept="image/*" style="display:none">
+      <div class="modal-foto-lbl" id="mFotoAddLbl">📷 Tocca per aggiungere una foto</div>
+      <img class="modal-foto-preview" id="mFotoPreview" alt="">
+      <button class="modal-foto-rm" id="mFotoRm" type="button">&#215;</button>
+    </div>
+    <button type="button" id="mFotoChangBtn" style="display:none;margin-top:.3rem;background:none;border:1px solid var(--cb);border-radius:6px;padding:.28rem .65rem;font-size:.62rem;color:var(--smoke);cursor:pointer">Cambia foto</button>
     <div class="modal-btns">
       <button class="btn-cancel fs" id="mCancel" type="button">Annulla</button>
       <button class="btn-save fd" id="mSave" type="button">Salva ricetta</button>
@@ -589,6 +597,7 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
    IMPORT FROM FILE — PDF, DOCX, TXT, PAGES
 ══════════════════════════════════════════ */
 var _importParsed = [];
+var _mFotoB64 = null;
 
 function openImport(){
   qs('importSpinner').style.display='none';
@@ -1047,7 +1056,7 @@ function addCott(sl,val){
   row.appendChild(inp);row.appendChild(rm);sl.appendChild(row);
 }
 function resetModal(){
-  _editId=null;qs('mTitle').textContent='Nuova Ricetta';
+  _editId=null;_editOrigSec=null;_mFotoB64=null;qs('mTitle').textContent='Nuova Ricetta';
   qs('mName').value='';qs('mProc').value='';qs('mTarget').value='';
   if(curSec){qs('mSec').value=curSec;fillCatSelect(qs('mCat'),curSec);}
   qs('ingList').innerHTML='';addIng(qs('ingList'));
@@ -1065,32 +1074,59 @@ function openEdit(id,r){
   if(r.k&&r.k.length)r.k.forEach(function(s){addCott(cl,s);});
   qs('mBg').classList.add('on');
 }
-function closeModal(){qs('mBg').classList.remove('on');}
+function closeModal(){
+  qs('mBg').classList.remove('on');
+  // Reset foto UI
+  _mFotoB64=null;
+  var fa=qs('mFotoArea'),fp=qs('mFotoPreview'),lbl=qs('mFotoAddLbl'),btn=qs('mFotoChangBtn');
+  if(fa)fa.classList.remove('has-foto');
+  if(fp)fp.src='';
+  if(lbl)lbl.style.display='';
+  if(btn)btn.style.display='none';
+}
 function doSave(){
-  if(!FB_URL){alert('Configura Firebase prima. Vai su Admin → URL Firebase.');return;}
+  if(!FB_URL){alert('Configura Firebase in Admin.');return;}
   var name=(qs('mName').value||'').trim();if(!name){alert('Inserisci il nome della ricetta.');return;}
-  var sec=qs('mSec').value,cat=qs('mCat').value;
+  var sec=(qs('mSec')&&qs('mSec').value)||curSec||'panificazione';
+  var cat=(qs('mCat')&&qs('mCat').value)||'Altro';
+  var origSec=_editOrigSec||curSec;
   var rows=qs('ingList').querySelectorAll('.ing-row');var ings=[];
   rows.forEach(function(row){var ins=row.querySelectorAll('input');var iN=(ins[0].value||'').trim(),iQ=ins[1].value!==''?parseFloat(ins[1].value):null,iU=(ins[2].value||'').trim()||'g';if(iN)ings.push([iN,iQ,iU]);});
   if(!ings.length){alert('Aggiungi almeno un ingrediente.');return;}
-  var cottRows=qs('cottList').querySelectorAll('.step-row input'),cott=[];
-  cottRows.forEach(function(inp){var v=(inp.value||'').trim();if(v)cott.push(v);});
-  var proc=(qs('mProc').value||'').trim(),target=(qs('mTarget').value||'').trim();
+  var cottRows=(qs('cottList')&&qs('cottList').querySelectorAll('.step-row input'))||[];
+  var cott=[];cottRows.forEach(function(inp){var v=(inp.value||'').trim();if(v)cott.push(v);});
+  var proc=(qs('mProc')&&qs('mProc').value||'').trim();
+  var target=(qs('mTarget')&&qs('mTarget').value||'').trim();
+  var piatto=(qs('mPiatto')&&qs('mPiatto').value||'').trim();
   var rec={n:name,c:cat,s:sec,i:ings,ts:Date.now()};
-  if(proc)rec.p=proc;if(cott.length)rec.k=cott;if(target)rec.q=target;
-  setDots('loading');
-  var savedSec=sec;
-  if(_editId){
-    fbPut(savedSec,_editId,rec).then(function(){
-      if(savedSec===curSec){recipes[_editId]=rec;}else{delete recipes[_editId];loadRecipes(curSec);}
-      setDots('ok');renderCats();renderGrid();closeModal();
-    }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+  if(proc)rec.p=proc;if(cott.length)rec.k=cott;if(target)rec.q=target;if(piatto)rec.piatto=piatto;
+  // Foto: usa nuova se caricata, altrimenti mantieni quella esistente
+  if(_editId&&recipes[_editId]&&recipes[_editId].img&&!_mFotoB64){
+    rec.img=recipes[_editId].img;
+  }
+  function _persist(finalRec){
+    setDots('loading');
+    if(_editId){
+      if(sec!==origSec){
+        fbPost(sec,finalRec).then(function(res){
+          if(res&&res.name){fbDel(origSec,_editId).then(function(){delete recipes[_editId];if(sec===curSec)recipes[res.name]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();});}
+        }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+      } else {
+        fbPut(sec,_editId,finalRec).then(function(){recipes[_editId]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();}).catch(function(){setDots('err');alert('Errore salvataggio.');});
+      }
+    } else {
+      fbPost(sec,finalRec).then(function(res){
+        if(res&&res.name){if(sec===curSec)recipes[res.name]=finalRec;setDots('ok');buildIngDatalist&&buildIngDatalist();renderCats();renderGrid();closeModal();}
+      }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+    }
+  }
+  if(_mFotoB64){
+    compressImg(_mFotoB64,'image/jpeg',700,0.65,function(cb64,cmime){rec.img={b64:cb64,mime:cmime};_persist(rec);});
   } else {
-    fbPost(savedSec,rec).then(function(result){
-      if(result&&result.name){if(savedSec===curSec)recipes[result.name]=rec;setDots('ok');renderCats();renderGrid();closeModal();}
-    }).catch(function(){setDots('err');alert('Errore salvataggio.');});
+    _persist(rec);
   }
 }
+
 
 /* ══════════════════════ CONFIRM DEL ══════════════════════ */
 function openCfm(id,name){_delId=id;qs('cfmName').textContent='Eliminare "'+name+'"?';qs('cfmBg').classList.add('on');}
