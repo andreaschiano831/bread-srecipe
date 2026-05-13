@@ -581,7 +581,10 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+
 /* ══════════════════════════════════════════
    IMPORT FROM FILE — PDF, DOCX, TXT, PAGES
 ══════════════════════════════════════════ */
@@ -792,9 +795,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Preload groq key
   var savedGk;try{savedGk=localStorage.getItem('groq_key');}catch(e){}
   if(savedGk){if(igk)igk.value=savedGk;}
-},false);</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>
+},false);
 /* ══════════════════════ CONFIG ══════════════════════ */
 var ADMIN_PIN='durso2026';
 var FIREBASE_HARDCODED='https://pane-ef699-default-rtdb.firebaseio.com';
@@ -1285,6 +1286,12 @@ function boot(){
   qs('vList').addEventListener('click',function(){qs('grid').classList.add('list');qs('vList').classList.add('vbtn-on');qs('vGrid').classList.remove('vbtn-on');});
   /* fab */
   qs('fab').addEventListener('click',function(){var m=qs('fabMenu');var open=m.style.display!=='none';m.style.display=open?'none':'flex';qs('fab').classList.toggle('open',!open);});
+  var _fImp=qs('fabImport');
+  if(_fImp)_fImp.addEventListener('click',function(){
+    var m=qs('fabMenu');if(m)m.style.display='none';
+    var fab=qs('fab');if(fab)fab.classList.remove('open');
+    openImport();
+  });
   qs('fabAi').addEventListener('click',function(){qs('fabMenu').style.display='none';qs('fab').classList.remove('open');openAiModal();});
   qs('fabManual').addEventListener('click',function(){qs('fabMenu').style.display='none';qs('fab').classList.remove('open');resetModal();qs('mBg').classList.add('on');});
   /* modal ricetta */
