@@ -1231,6 +1231,19 @@ function saveAiRecipe(){
 
 /* ══════════════════════ BOOT ══════════════════════ */
 
+/* ══════════════════════ TEMA ══════════════════════ */
+function applyTheme(id){
+  var THEME_IDS=['t-verde','t-ebano','t-bordeaux','t-ottanio','t-carta'];
+  THEME_IDS.forEach(function(t){document.body.classList.remove(t);});
+  if(id&&id!=='t-verde')document.body.classList.add(id);
+  document.querySelectorAll('.t-dot').forEach(function(d){d.classList.toggle('on',d.dataset.t===id);});
+  try{localStorage.setItem('app_theme',id);}catch(e){}
+}
+function loadTheme(){
+  var t;try{t=localStorage.getItem('app_theme')||'t-verde';}catch(e){t='t-verde';}
+  applyTheme(t);
+}
+
 /* ══════════════════════ DRAWER / HAMBURGER ══════════════════════ */
 function openDrawer(){
   var d=qs('drawer'),o=qs('drawerOverlay');
@@ -1259,6 +1272,11 @@ function closeDrawer(){
 }
 
 function boot(){
+  loadTheme();
+  // Wire theme dots on landing
+  document.querySelectorAll('.t-dot').forEach(function(d){
+    d.addEventListener('click',function(){applyTheme(d.dataset.t);});
+  });
   if(isUnlocked()){qs('pwd').style.display='none';qs('landing').style.display='flex';}
   qs('pwdBtn').addEventListener('click',submitPwd);
   qs('pwdInp').addEventListener('keyup',function(e){if(e.key==='Enter')submitPwd();});
@@ -1411,6 +1429,65 @@ function boot(){
     };reader.readAsDataURL(file);
   });
   if(FB_URL)setDots('ok');
+  // Lightbox
+  var lc=document.getElementById('lightboxClose');if(lc)lc.addEventListener('click',closeLightbox);
+  var lb=document.getElementById('lightboxBg');if(lb)lb.addEventListener('click',function(e){if(e.target===lb)closeLightbox();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeLightbox();closeRecenti();}});
+  // Recenti
+  var rb=document.getElementById('recentiBtn');if(rb)rb.addEventListener('click',openRecenti);
+  var ro=document.getElementById('recentiOverlay');if(ro)ro.addEventListener('click',closeRecenti);
+  var rc=document.getElementById('recentiClose');if(rc)rc.addEventListener('click',closeRecenti);
+  // Qproc
+  var qc=document.getElementById('qprocCancel');if(qc)qc.addEventListener('click',closeQuickProc);
+  var qs2=document.getElementById('qprocSave');if(qs2)qs2.addEventListener('click',saveQuickProc);
+  var qb=document.getElementById('qprocBg');if(qb)qb.addEventListener('click',function(e){if(e.target===qb)closeQuickProc();});
+  // Modal foto
+  var mfa=document.getElementById('mFotoArea');
+  var mff=document.getElementById('mFotoFile');
+  if(mff)mff.addEventListener('change',function(){
+    var file=this.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      _mFotoB64=ev.target.result.split(',')[1];
+      var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
+      fa&&fa.classList.add('has-foto'); // ensure has-foto is set first
+      if(fp)fp.src=ev.target.result;if(fa)fa.classList.add('has-foto');
+      if(lbl)lbl.style.display='none';if(btn)btn.style.display='inline-block';
+    };reader.readAsDataURL(file);this.value='';
+  });
+  if(mfa)// File input now overlays the area directly - no need for mff.click()
+  // But intercept clicks on the preview image to open lightbox instead of file picker
+  var mfp2=document.getElementById('mFotoPreview');
+  if(mfp2)mfp2.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(this.src&&this.src!==window.location.href)openLightbox(this.src);
+  });
+  var mfr=document.getElementById('mFotoRm');
+  if(mfr)mfr.addEventListener('click',function(e){
+    e.stopPropagation();_mFotoB64=null;
+    var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
+    if(fp)fp.src='';if(fa)fa.classList.remove('has-foto');if(lbl)lbl.style.display='';if(btn)btn.style.display='none';
+  });
+  var mfcb=document.getElementById('mFotoChangBtn');
+  if(mfcb)mfcb.addEventListener('click',function(e){
+    e.stopPropagation();
+    // Reset has-foto so the file input overlay becomes active again
+    var fa2=document.getElementById('mFotoArea');
+    if(fa2)fa2.classList.remove('has-foto');
+    // We'll re-add has-foto when file is selected
+    if(mff)mff.click();
+  });
+  // Modal foto area click → lightbox or file picker
+  var _mfa=qs('mFotoArea'),_mff=qs('mFotoFile');
+  if(_mfa)_mfa.addEventListener('click',function(){
+    if(this.classList.contains('has-foto')){
+      var _fp=qs('mFotoPreview');
+      if(_fp&&_fp.src&&_fp.src!==window.location.href)openLightbox(_fp.src);
+    }
+  });
+  // Cucina foto
+  var cfw=document.getElementById('cucinaFotoWrap');
+  if(cfw)cfw.addEventListener('click',function(){var img=document.getElementById('cucinaFotoImg');if(img&&img.src)openLightbox(img.src);});
 }
 var _booted=false;
 function safeboot(){if(_booted)return;_booted=true;boot();}
@@ -1539,60 +1616,7 @@ function duplicateRec(id,r){
 
 /* ══ WIRE NEW BUTTONS ON SAFEBOOT ══ */
 var _origSafeboot=typeof safeboot==='function'?safeboot:null;
-document.addEventListener('DOMContentLoaded',function(){
-  // Lightbox
-  var lc=document.getElementById('lightboxClose');if(lc)lc.addEventListener('click',closeLightbox);
-  var lb=document.getElementById('lightboxBg');if(lb)lb.addEventListener('click',function(e){if(e.target===lb)closeLightbox();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeLightbox();closeRecenti();}});
-  // Recenti
-  var rb=document.getElementById('recentiBtn');if(rb)rb.addEventListener('click',openRecenti);
-  var ro=document.getElementById('recentiOverlay');if(ro)ro.addEventListener('click',closeRecenti);
-  var rc=document.getElementById('recentiClose');if(rc)rc.addEventListener('click',closeRecenti);
-  // Qproc
-  var qc=document.getElementById('qprocCancel');if(qc)qc.addEventListener('click',closeQuickProc);
-  var qs2=document.getElementById('qprocSave');if(qs2)qs2.addEventListener('click',saveQuickProc);
-  var qb=document.getElementById('qprocBg');if(qb)qb.addEventListener('click',function(e){if(e.target===qb)closeQuickProc();});
-  // Modal foto
-  var mfa=document.getElementById('mFotoArea');
-  var mff=document.getElementById('mFotoFile');
-  var _mFotoB64=null;
-  if(mff)mff.addEventListener('change',function(){
-    var file=this.files[0];if(!file)return;
-    var reader=new FileReader();
-    reader.onload=function(ev){
-      _mFotoB64=ev.target.result.split(',')[1];
-      var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
-      fa&&fa.classList.add('has-foto'); // ensure has-foto is set first
-      if(fp)fp.src=ev.target.result;if(fa)fa.classList.add('has-foto');
-      if(lbl)lbl.style.display='none';if(btn)btn.style.display='inline-block';
-    };reader.readAsDataURL(file);this.value='';
-  });
-  if(mfa)// File input now overlays the area directly - no need for mff.click()
-  // But intercept clicks on the preview image to open lightbox instead of file picker
-  var mfp2=document.getElementById('mFotoPreview');
-  if(mfp2)mfp2.addEventListener('click',function(e){
-    e.stopPropagation();
-    if(this.src&&this.src!==window.location.href)openLightbox(this.src);
-  });
-  var mfr=document.getElementById('mFotoRm');
-  if(mfr)mfr.addEventListener('click',function(e){
-    e.stopPropagation();_mFotoB64=null;
-    var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
-    if(fp)fp.src='';if(fa)fa.classList.remove('has-foto');if(lbl)lbl.style.display='';if(btn)btn.style.display='none';
-  });
-  var mfcb=document.getElementById('mFotoChangBtn');
-  if(mfcb)mfcb.addEventListener('click',function(e){
-    e.stopPropagation();
-    // Reset has-foto so the file input overlay becomes active again
-    var fa2=document.getElementById('mFotoArea');
-    if(fa2)fa2.classList.remove('has-foto');
-    // We'll re-add has-foto when file is selected
-    if(mff)mff.click();
-  });
-  // Cucina foto
-  var cfw=document.getElementById('cucinaFotoWrap');
-  if(cfw)cfw.addEventListener('click',function(){var img=document.getElementById('cucinaFotoImg');if(img&&img.src)openLightbox(img.src);});
-},false);
+
 </script>
 
 <!-- LIGHTBOX -->
