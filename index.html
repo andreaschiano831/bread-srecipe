@@ -1065,7 +1065,8 @@ function resetModal(){
   qs('cottList').innerHTML='';
 }
 function openEdit(id,r){
-  _editId=id;qs('mTitle').textContent='Modifica Ricetta';
+  _editId=id;_editOrigSec=r.s||curSec||'panificazione';
+  qs('mTitle').textContent='Modifica Ricetta';
   var sec=r.s||curSec||'panificazione';
   qs('mSec').value=sec;fillCatSelect(qs('mCat'),sec);
   qs('mName').value=r.n||'';qs('mProc').value=r.p||'';qs('mTarget').value=r.q||'';
