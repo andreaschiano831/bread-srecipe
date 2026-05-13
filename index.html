@@ -792,9 +792,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Preload groq key
   var savedGk;try{savedGk=localStorage.getItem('groq_key');}catch(e){}
   if(savedGk){if(igk)igk.value=savedGk;}
-},false);
-
-</script>
+},false);</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 /* ══════════════════════ CONFIG ══════════════════════ */
@@ -803,10 +801,13 @@ var FIREBASE_HARDCODED='https://pane-ef699-default-rtdb.firebaseio.com';
 var FB_URL=(function(){if(typeof FIREBASE_HARDCODED!=='undefined'&&FIREBASE_HARDCODED)return FIREBASE_HARDCODED;try{return localStorage.getItem('fb_url')||'';}catch(e){return '';}})();
 
 var SECTIONS={
-  'panificazione':{label:'Panificazione',sub:'Pane · Lievitati · Pizza · Focaccia',cats:['Pane','Panini','Pizza & Focaccia','Lievito Madre','Biga','Senza Glutine','Altro'],accent:'#4A7E55'},
-  'fine-dining':{label:'Fine Dining',sub:'Aperitivo · Antipasti · Primi · Secondi',cats:['Aperitivo','Antipasti','Primi','Secondi','Altro'],accent:'#C9A84C'},
-  'colazioni':{label:'Colazioni',sub:'Impasti · Creme · Lievitati · Pasticcini',cats:['Impasti','Creme','Lievitati','Marmellate','Pasticcini','Altro'],accent:'#8B6A3A'}
+  'panificazione':{label:'Panificazione',sub:'Pane · Lievitati · Pizza · Focaccia',cats:['Pane','Panini','Pizza & Focaccia','Focaccia','Lievito Madre','Biga','Senza Glutine','Altro'],accent:'#4A7E55'},
+  'fine-dining':{label:'Fine Dining',sub:'Aperitivo · Antipasti · Primi · Secondi',cats:['Aperitivo','Antipasti','Primi','Secondi','Ganache','Cioccolatini','Altro'],accent:'#C9A84C'},
+  'colazioni':{label:'Colazioni',sub:'Impasti · Creme · Lievitati · Pasticcini',cats:['Impasti','Paste','Creme','Lievitati','Torte','Pasticcini','Marmellate','Altro'],accent:'#8B6A3A'},
+  'gelateria':{label:'Gelateria',sub:'Gelati · Sorbetti · Granite · Semifreddi',cats:['Gelati','Sorbetti','Granite','Semifreddi','Basi','Altro'],accent:'#5A98A8'},
+  'torte':{label:'Torte',sub:'Mousse · Glasse · Creme · Semifreddi',cats:['Mousse','Creme','Glasse','Gelatine','Biscotti','Torte','Semifreddi','Pralinati','Altro'],accent:'#9A6090'}
 };
+SECTIONS['__all__']={label:'Tutte le ricette',sub:'Ricerca globale su tutte le sezioni',cats:[],accent:'#888888',virtual:true};
 
 var SEED_PANI=[
 {n:"Grissini",c:"Pane",s:"panificazione",i:[["Farina 00",500,"g"],["Farina 0",250,"g"],["Olio di oliva",200,"g"],["Acqua",350,"g"],["Sale",20,"g"],["Lievito fresco",15,"g"]],p:"Impastare non troppo. Lievitare 1–2 ore. Spezzare · riposo 30 min · infornare.",k:["175° · Misto vapore · 7 min","170° · Secco · v5 · 7 min · Valvola aperta"],q:"≥ 60 pz a sera",ts:1700000000000},
@@ -865,14 +866,17 @@ function showLanding(){
   document.documentElement.style.setProperty('--acc','var(--g2)');
 }
 function openSection(sec){
+  if(sec==='__all__'){openAllSection();return;}
   curSec=sec;curCat='Tutte';
   var s=SECTIONS[sec];
-  document.documentElement.style.setProperty('--acc',s.accent);
+  if(!s){console.warn('Sezione sconosciuta:',sec);return;}
+  document.documentElement.style.setProperty('--acc',s.accent||'var(--g2)');
   qs('hdTitle').textContent=s.label;qs('hdSub').textContent=s.sub;
   var ms=qs('mSec');if(ms)ms.value=sec;
   fillCatSelect(qs('mCat'),sec);
   qs('landing').style.display='none';qs('app').classList.add('on');
-  qs('fabWrap').style.display='flex';
+  qs('fabWrap').style.display=isAdmin?'flex':'none';
+  var rb=qs('recentiBtn');if(rb)rb.classList.add('show');
   dose=1;document.getElementById('dVal').value=1;qs('srch').value='';
   renderCats();loadRecipes(sec);
   if(syncTimer)clearInterval(syncTimer);
@@ -893,7 +897,14 @@ function loadRecipes(sec,silent){
     if(data&&typeof data==='object'){Object.keys(data).forEach(function(k){if(data[k])recipes[k]=data[k];});}
     if(sec==='panificazione'&&Object.keys(recipes).length===0){seedSection(sec,SEED_PANI);return;}
     renderCats();renderGrid();
-  }).catch(function(){setDots('err');if(!silent)showEmpty('Errore connessione Firebase');});
+  }).catch(function(e){
+    setDots('err');
+    if(!silent){
+      var msg='Errore connessione Firebase';
+      if(e&&(e.message||'').indexOf('CORS')>-1)msg='Errore CORS Firebase — controlla le regole del database';
+      showEmpty(msg);
+    }
+  });
 }
 function seedSection(sec,data){
   data.forEach(function(r){fbPost(sec,r);});
@@ -1179,6 +1190,34 @@ function saveAiRecipe(){
 }
 
 /* ══════════════════════ BOOT ══════════════════════ */
+
+/* ══════════════════════ DRAWER / HAMBURGER ══════════════════════ */
+function openDrawer(){
+  var d=qs('drawer'),o=qs('drawerOverlay');
+  if(d)d.style.transform='none';
+  if(o)o.style.display='block';
+  var gk;try{gk=localStorage.getItem('groq_key');}catch(e){}
+  if(gk){var dg=qs('drawerGroq');if(dg)dg.value=gk;}
+  if(FB_URL){var df=qs('drawerFb');if(df)df.value=FB_URL;}
+  var dt=qs('drawerThemes');
+  if(dt){dt.innerHTML='';
+    var THEMES2=[{id:'t-verde',l:'Verde',c:'#4A7E55'},{id:'t-carta',l:'Carta',c:'#A08060'},{id:'t-ebano',l:'Ebano',c:'#2A2418'},{id:'t-bordeaux',l:'Bordeaux',c:'#6B1428'},{id:'t-ottanio',l:'Ottanio',c:'#105060'}];
+    var cur;try{cur=localStorage.getItem('app_theme')||'t-verde';}catch(e){cur='t-verde';}
+    THEMES2.forEach(function(t){
+      var b=document.createElement('button');b.type='button';
+      b.style.cssText='border:1.5px solid '+(cur===t.id?'#fff':'transparent')+';border-radius:8px;padding:.5rem .3rem;font-size:.62rem;cursor:pointer;background:'+t.c+';color:#fff;text-align:center;-webkit-tap-highlight-color:transparent';
+      b.textContent=t.l;
+      b.addEventListener('click',function(){applyTheme(t.id);closeDrawer();});
+      dt.appendChild(b);
+    });
+  }
+}
+function closeDrawer(){
+  var d=qs('drawer'),o=qs('drawerOverlay');
+  if(d)d.style.transform='translateX(100%)';
+  if(o)o.style.display='none';
+}
+
 function boot(){
   if(isUnlocked()){qs('pwd').style.display='none';qs('landing').style.display='flex';}
   qs('pwdBtn').addEventListener('click',submitPwd);
@@ -1187,6 +1226,50 @@ function boot(){
   qs('admBtn').addEventListener('click',openAdm);
   /* panels */
   document.querySelectorAll('.panel').forEach(function(p){p.addEventListener('click',function(){openSection(p.dataset.sec);});});
+  /* panel tutte */
+  var _pab=document.getElementById('panelAllBar');
+  if(_pab)_pab.addEventListener('click',function(){openSection('__all__');});
+  /* hamburger */
+  var _gmb=document.getElementById('globalMenuBtn');
+  if(_gmb)_gmb.addEventListener('click',openDrawer);
+  var _dc=document.getElementById('drawerClose');
+  if(_dc)_dc.addEventListener('click',closeDrawer);
+  var _dov=document.getElementById('drawerOverlay');
+  if(_dov)_dov.addEventListener('click',closeDrawer);
+  /* drawer buttons */
+  var _dpok=qs('drawerPinOk');
+  if(_dpok)_dpok.addEventListener('click',function(){
+    var val=(qs('drawerPin').value||'').trim(),msg=qs('drawerPinMsg');
+    if(val===ADMIN_PIN){isAdmin=true;if(msg){msg.textContent='✓ Admin';msg.style.color='var(--g2)';}var fw=qs('fabWrap');if(fw&&curSec)fw.style.display='flex';renderGrid();}
+    else{if(msg){msg.textContent='PIN non corretto';msg.style.color='#c04030';}}
+    setTimeout(function(){if(msg)msg.textContent='';},2500);
+  });
+  var _dgok=qs('drawerGroqOk');
+  if(_dgok)_dgok.addEventListener('click',function(){
+    var k=(qs('drawerGroq').value||'').trim(),msg=qs('drawerGroqMsg');
+    if(!k||k.length<10){if(msg){msg.textContent='Chiave non valida';msg.style.color='#c04030';}return;}
+    try{localStorage.setItem('groq_key',k);}catch(e){}
+    var ak=qs('aiKey');if(ak)ak.value=k;
+    var igk=qs('importGroqKey');if(igk)igk.value=k;
+    if(msg){msg.textContent='Salvata ✓';msg.style.color='var(--g2)';}
+    setTimeout(function(){if(msg)msg.textContent='';},2000);
+  });
+  var _dfok=qs('drawerFbOk');
+  if(_dfok)_dfok.addEventListener('click',function(){
+    var v=(qs('drawerFb').value||'').trim().replace(/\/$/,''),msg=qs('drawerFbMsg');
+    if(!v||!v.startsWith('https://')){if(msg){msg.textContent='URL non valido';msg.style.color='#c04030';}return;}
+    FB_URL=v;try{localStorage.setItem('fb_url',v);}catch(e){}
+    if(msg){msg.textContent='Salvato ✓';msg.style.color='var(--g2)';}
+    if(curSec&&curSec!=='__all__')loadRecipes(curSec);
+    setTimeout(function(){if(msg)msg.textContent='';},2000);
+  });
+  var _drb=qs('drawerRecentiBtn');if(_drb)_drb.addEventListener('click',function(){closeDrawer();if(typeof openRecenti==='function')openRecenti();});
+  var _dab=qs('drawerAddBtn');if(_dab)_dab.addEventListener('click',function(){closeDrawer();if(typeof resetModal==='function'){resetModal();var mb=qs('mBg');if(mb)mb.classList.add('on');}});
+  var _dib=qs('drawerImportBtn');if(_dib)_dib.addEventListener('click',function(){closeDrawer();if(typeof openImport==='function')openImport();});
+  /* preload saved keys in drawer */
+  var _savedGk;try{_savedGk=localStorage.getItem('groq_key');}catch(e){}
+  if(_savedGk){var _dgf=qs('drawerGroq');if(_dgf)_dgf.value=_savedGk;}
+  if(FB_URL){var _dff=qs('drawerFb');if(_dff)_dff.value=FB_URL;}
   /* back */
   qs('backBtn').addEventListener('click',showLanding);
   qs('admBtnApp').addEventListener('click',openAdm);
@@ -1294,7 +1377,7 @@ var _pab=document.getElementById('panelAllBar');
 if(_pab)_pab.addEventListener('click',function(){openSection('__all__');});
 
 /* ══ ULTIME AGGIUNTE ══ */
-SECTIONS['__all__']={label:'Tutte le ricette',sub:'Ricerca globale su tutte le sezioni',cats:[],accent:'#888888',virtual:true};
+
 
 function openAllSection(){
   curSec='__all__';curCat='Tutte';
@@ -1325,12 +1408,7 @@ function openAllSection(){
   syncTimer=setInterval(function(){if(curSec==='__all__')openAllSection();},60000);
 }
 
-var _origOpenSection=openSection;
-openSection=function(sec){
-  if(sec==='__all__'){openAllSection();return;}
-  _origOpenSection(sec);
-  var rb=document.getElementById('recentiBtn');if(rb)rb.classList.add('show');
-};
+/* openSection already patched above */
 
 function openRecenti(){
   document.getElementById('recentiDrawer').classList.add('on');
@@ -1372,7 +1450,7 @@ function renderRecenti(allRecs){
     var item=document.createElement('div');item.className='recenti-item';
     var nm=document.createElement('div');nm.className='recenti-item-name fd';nm.textContent=r.n;
     var meta=document.createElement('div');meta.className='recenti-item-meta';
-    if(r._sec&&SECTIONS[r._sec]){var sl=document.createElement('span');sl.className='recenti-item-sec fsc';sl.textContent=SECTIONS[r._sec].label;meta.appendChild(sl);}
+    if(r._sec&&SECTIONS[r._sec]){var sl=document.createElement('span');sl.className='recenti-item-sec fsc';sl.textContent=SECTIONS[r._sec]?SECTIONS[r._sec].label:r._sec;meta.appendChild(sl);}
     if(r.c){var cl=document.createElement('span');cl.className='recenti-item-cat fsc';cl.textContent=r.c;meta.appendChild(cl);}
     var tl=document.createElement('span');tl.className='recenti-item-time fsc';tl.textContent=timeAgo(r.ts);meta.appendChild(tl);
     if(r.img&&r.img.b64){var th=document.createElement('img');th.src='data:'+r.img.mime+';base64,'+r.img.b64;th.style.cssText='width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid var(--rim)';meta.insertBefore(th,meta.firstChild);}
@@ -1524,5 +1602,71 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
 </div>
+
+<!-- ══════ HAMBURGER + DRAWER ══════ -->
+<button id="globalMenuBtn" type="button" style="position:fixed;top:10px;right:10px;z-index:9900;background:var(--card);border:1.5px solid var(--cb);border-radius:10px;width:38px;height:34px;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;transition:border-color .18s">
+  <span style="display:block;width:14px;height:1.5px;background:var(--ink);border-radius:1px"></span>
+  <span style="display:block;width:14px;height:1.5px;background:var(--ink);border-radius:1px"></span>
+  <span style="display:block;width:14px;height:1.5px;background:var(--ink);border-radius:1px"></span>
+</button>
+<div id="drawerOverlay" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5)"></div>
+<aside id="drawer" style="position:fixed;top:0;right:0;bottom:0;width:88vw;max-width:300px;background:var(--card);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:-3px 0 24px rgba(0,0,0,.22);transform:translateX(100%);transition:transform .3s cubic-bezier(.23,1,.32,1)">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1rem .8rem;border-bottom:1px solid var(--cb)">
+    <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--g2)">Il Ricettario</span>
+    <button id="drawerClose" type="button" style="background:none;border:1px solid var(--cb);border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem;color:var(--smoke);display:flex;align-items:center;justify-content:center">&#215;</button>
+  </div>
+  <!-- Admin PIN -->
+  <div style="padding:.5rem 1rem .2rem;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke3);font-family:'Cormorant SC',serif">Admin</div>
+  <div style="padding:.3rem 1rem">
+    <label style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke2);margin-bottom:.3rem;display:block">PIN Admin</label>
+    <div style="display:flex;gap:.3rem">
+      <input type="password" id="drawerPin" placeholder="durso2026" maxlength="20" style="flex:1;border:1px solid var(--cb);border-radius:6px;padding:.4rem .6rem;font-size:.85rem;outline:none;min-width:0;background:var(--ctrl);-webkit-appearance:none;color:var(--ink)">
+      <button type="button" id="drawerPinOk" style="background:var(--g2);border:none;border-radius:6px;padding:.4rem .9rem;color:#fff;font-size:.8rem;cursor:pointer">OK</button>
+    </div>
+    <div id="drawerPinMsg" style="font-size:.6rem;color:var(--g2);margin-top:.2rem;min-height:.9rem;font-family:'Cormorant SC',serif"></div>
+  </div>
+  <div style="height:1px;background:var(--cb);margin:.3rem 1rem"></div>
+  <!-- AI Key -->
+  <div style="padding:.5rem 1rem .2rem;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke3);font-family:'Cormorant SC',serif">AI</div>
+  <div style="padding:.3rem 1rem">
+    <label style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke2);margin-bottom:.3rem;display:block">Chiave Groq (gratuita)</label>
+    <div style="display:flex;gap:.3rem">
+      <input type="password" id="drawerGroq" placeholder="gsk_…" style="flex:1;border:1px solid var(--cb);border-radius:6px;padding:.4rem .6rem;font-size:.85rem;outline:none;min-width:0;background:var(--ctrl);-webkit-appearance:none;color:var(--ink)">
+      <button type="button" id="drawerGroqOk" style="background:var(--g2);border:none;border-radius:6px;padding:.4rem .9rem;color:#fff;font-size:.8rem;cursor:pointer">OK</button>
+    </div>
+    <div id="drawerGroqMsg" style="font-size:.6rem;color:var(--g2);margin-top:.2rem;min-height:.9rem;font-family:'Cormorant SC',serif"></div>
+  </div>
+  <div style="height:1px;background:var(--cb);margin:.3rem 1rem"></div>
+  <!-- Azioni -->
+  <div style="padding:.5rem 1rem .2rem;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke3);font-family:'Cormorant SC',serif">Azioni</div>
+  <button id="drawerRecentiBtn" type="button" style="display:flex;align-items:center;gap:.7rem;padding:.65rem 1rem;border:none;background:none;width:100%;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent">
+    <span style="font-size:.9rem;width:20px">&#128336;</span>
+    <span><span style="font-style:italic;font-family:'Playfair Display',serif;font-size:.88rem;color:var(--ink);display:block">Ultime aggiunte</span><span style="display:block;font-size:.56rem;color:var(--smoke2)">Ultime 20 ricette</span></span>
+  </button>
+  <button id="drawerAddBtn" type="button" style="display:flex;align-items:center;gap:.7rem;padding:.65rem 1rem;border:none;background:none;width:100%;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent">
+    <span style="font-size:.9rem;width:20px">+</span>
+    <span><span style="font-style:italic;font-family:'Playfair Display',serif;font-size:.88rem;color:var(--ink);display:block">Aggiungi ricetta</span><span style="display:block;font-size:.56rem;color:var(--smoke2)">Inserimento manuale</span></span>
+  </button>
+  <button id="drawerImportBtn" type="button" style="display:flex;align-items:center;gap:.7rem;padding:.65rem 1rem;border:none;background:none;width:100%;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent">
+    <span style="font-size:.9rem;width:20px">&#128196;</span>
+    <span><span style="font-style:italic;font-family:'Playfair Display',serif;font-size:.88rem;color:var(--ink);display:block">Importa da documento</span><span style="display:block;font-size:.56rem;color:var(--smoke2)">PDF, .docx, Pages, .txt</span></span>
+  </button>
+  <div style="height:1px;background:var(--cb);margin:.3rem 1rem"></div>
+  <!-- Temi -->
+  <div style="padding:.5rem 1rem .2rem;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke3);font-family:'Cormorant SC',serif">Tema</div>
+  <div id="drawerThemes" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;padding:.3rem 1rem .6rem"></div>
+  <div style="height:1px;background:var(--cb);margin:.3rem 1rem"></div>
+  <!-- Firebase -->
+  <div style="padding:.5rem 1rem .2rem;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke3);font-family:'Cormorant SC',serif">Database</div>
+  <div style="padding:.3rem 1rem">
+    <label style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke2);margin-bottom:.3rem;display:block">URL Firebase</label>
+    <div style="display:flex;gap:.3rem">
+      <input type="url" id="drawerFb" placeholder="https://…firebaseio.com" style="flex:1;border:1px solid var(--cb);border-radius:6px;padding:.4rem .6rem;font-size:.72rem;outline:none;min-width:0;background:var(--ctrl);-webkit-appearance:none;color:var(--ink)">
+      <button type="button" id="drawerFbOk" style="background:var(--g2);border:none;border-radius:6px;padding:.4rem .9rem;color:#fff;font-size:.8rem;cursor:pointer">OK</button>
+    </div>
+    <div id="drawerFbMsg" style="font-size:.6rem;color:var(--g2);margin-top:.2rem;min-height:.9rem;font-family:'Cormorant SC',serif"></div>
+  </div>
+</aside>
+
 </body>
 </html>
