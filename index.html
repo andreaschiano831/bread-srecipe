@@ -346,9 +346,8 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
 .ai-foto-sticky.on{display:block}
 .ai-foto-sticky img{width:100%;max-height:220px;object-fit:contain;display:block;background:var(--bg2)}
 .ai-photo-grid{display:none;flex-wrap:wrap;gap:.5rem;margin-top:.65rem}
-.modal-foto-area{border:2px dashed var(--cb);border-radius:10px;overflow:hidden;margin-top:.25rem;cursor:pointer;background:var(--ctrl);position:relative;min-height:80px;display:flex;align-items:center;justify-content:center}
-.modal-foto-area.has-foto{border-style:solid;border-color:var(--g2);padding:0;cursor:default}
-.modal-foto-area.has-foto input[type=file]{display:none!important}
+.modal-foto-area{border:2px dashed var(--cb);border-radius:10px;overflow:hidden;margin-top:.25rem;cursor:pointer;background:var(--ctrl);position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.modal-foto-area.has-foto{border-style:solid;border-color:var(--g2);padding:0;cursor:default;pointer-events:none}
 .modal-foto-lbl{font-size:.66rem;color:var(--smoke2);padding:1rem 1rem;text-align:center;pointer-events:none;position:relative;z-index:0}
 .modal-foto-lbl-ico{font-size:1.4rem;display:block;margin-bottom:.3rem;opacity:.4}
 .modal-foto-preview{width:100%;max-height:200px;object-fit:cover;display:none;cursor:zoom-in}
@@ -505,13 +504,13 @@ body{font-family:'Outfit',system-ui,sans-serif;background:#EDF0E9;color:#1A1E18;
     <label class="fsc">Target / Note <span style="opacity:.45;font-weight:300">(facoltativo)</span></label>
     <input type="text" id="mTarget" class="fs" placeholder="Es. ≥ 60 pz a sera">
     <label style="display:block;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke);margin:.75rem 0 .2rem">Foto ricetta <span style="opacity:.4;font-weight:300">(opzionale)</span></label>
-    <div class="modal-foto-area" id="mFotoArea">
-      <input type="file" id="mFotoFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1">
+    <input type="file" id="mFotoFile" accept="image/*" style="display:none">
+    <label for="mFotoFile" class="modal-foto-area" id="mFotoArea">
       <div class="modal-foto-lbl" id="mFotoAddLbl"><span class="modal-foto-lbl-ico">📷</span>Tocca per aggiungere una foto</div>
       <img class="modal-foto-preview" id="mFotoPreview" alt="">
-      <button class="modal-foto-rm" id="mFotoRm" type="button" style="z-index:2">&#215;</button>
-    </div>
-    <button type="button" id="mFotoChangBtn" style="display:none;margin-top:.3rem;background:none;border:1px solid var(--cb);border-radius:6px;padding:.28rem .65rem;font-size:.62rem;color:var(--smoke);cursor:pointer">Cambia foto</button>
+      <button class="modal-foto-rm" id="mFotoRm" type="button" onclick="event.preventDefault();event.stopPropagation();">&#215;</button>
+    </label>
+    <button type="button" id="mFotoChangBtn" style="display:none;margin-top:.3rem;background:none;border:1px solid var(--cb);border-radius:6px;padding:.28rem .65rem;font-size:.62rem;color:var(--smoke);cursor:pointer">🔄 Cambia foto</button>
     <div class="modal-btns">
       <button class="btn-cancel fs" id="mCancel" type="button">Annulla</button>
       <button class="btn-save fd" id="mSave" type="button">Salva ricetta</button>
@@ -1071,7 +1070,12 @@ function addCott(sl,val){
   row.appendChild(inp);row.appendChild(rm);sl.appendChild(row);
 }
 function resetModal(){
-  _editId=null;_editOrigSec=null;_mFotoB64=null;qs('mTitle').textContent='Nuova Ricetta';
+  _editId=null;_editOrigSec=null;_mFotoB64=null;
+  var _fa=qs('mFotoArea'),_fp=qs('mFotoPreview'),_rm=qs('mFotoRm'),_btn=qs('mFotoChangBtn');
+  if(_fa){_fa.classList.remove('has-foto');_fa.style.pointerEvents='';}
+  if(_fp)_fp.src='';
+  if(_rm)_rm.style.display='none';
+  if(_btn)_btn.style.display='none';qs('mTitle').textContent='Nuova Ricetta';
   qs('mName').value='';qs('mProc').value='';qs('mTarget').value='';
   if(curSec){qs('mSec').value=curSec;fillCatSelect(qs('mCat'),curSec);}
   qs('ingList').innerHTML='';addIng(qs('ingList'));
@@ -1092,13 +1096,13 @@ function openEdit(id,r){
 }
 function closeModal(){
   qs('mBg').classList.remove('on');
-  // Reset foto UI
   _mFotoB64=null;
-  var fa=qs('mFotoArea'),fp=qs('mFotoPreview'),lbl=qs('mFotoAddLbl'),btn=qs('mFotoChangBtn');
-  if(fa)fa.classList.remove('has-foto');
+  var fa=qs('mFotoArea'),fp=qs('mFotoPreview'),lbl=qs('mFotoAddLbl'),btn=qs('mFotoChangBtn'),rm=qs('mFotoRm');
+  if(fa){fa.classList.remove('has-foto');fa.style.pointerEvents='';}
   if(fp)fp.src='';
   if(lbl)lbl.style.display='';
   if(btn)btn.style.display='none';
+  if(rm)rm.style.display='none';
 }
 function doSave(){
   if(!FB_URL){alert('Configura Firebase in Admin.');return;}
@@ -1471,18 +1475,19 @@ function boot(){
   var mff=document.getElementById('mFotoFile');
   if(mff)mff.addEventListener('change',function(){
     var file=this.files[0];if(!file)return;
-    // Warn if file is very large (>8MB)
     if(file.size>8*1024*1024){
-      alert('Foto troppo grande ('+Math.round(file.size/1024/1024,1)+'MB). Usa una foto più piccola, idealmente sotto 5MB.');
+      alert('Foto troppo grande ('+Math.round(file.size/1024/1024)+'MB). Usa una foto più piccola.');
       return;
     }
     var reader=new FileReader();
     reader.onload=function(ev){
       _mFotoB64=ev.target.result.split(',')[1];
-      var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
-      fa&&fa.classList.add('has-foto'); // ensure has-foto is set first
-      if(fp)fp.src=ev.target.result;if(fa)fa.classList.add('has-foto');
-      if(lbl)lbl.style.display='none';if(btn)btn.style.display='inline-block';
+      var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn'),rm=document.getElementById('mFotoRm');
+      if(fp)fp.src=ev.target.result;
+      if(fa){fa.classList.add('has-foto');fa.style.pointerEvents='none';}
+      if(lbl)lbl.style.display='none';
+      if(btn)btn.style.display='inline-block';
+      if(rm)rm.style.display='flex';
     };reader.readAsDataURL(file);this.value='';
   });
   if(mfa)// File input now overlays the area directly - no need for mff.click()
@@ -1493,11 +1498,18 @@ function boot(){
     if(this.src&&this.src!==window.location.href)openLightbox(this.src);
   });
   var mfr=document.getElementById('mFotoRm');
-  if(mfr)mfr.addEventListener('click',function(e){
-    e.stopPropagation();_mFotoB64=null;
-    var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
-    if(fp)fp.src='';if(fa)fa.classList.remove('has-foto');if(lbl)lbl.style.display='';if(btn)btn.style.display='none';
-  });
+  if(mfr){
+    mfr.style.cssText='position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem;display:none;align-items:center;justify-content:center;z-index:3;pointer-events:auto;-webkit-tap-highlight-color:transparent';
+    mfr.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      _mFotoB64=null;
+      var fp=document.getElementById('mFotoPreview'),fa=document.getElementById('mFotoArea'),lbl=document.getElementById('mFotoAddLbl'),btn=document.getElementById('mFotoChangBtn');
+      if(fp)fp.src='';
+      if(fa){fa.classList.remove('has-foto');fa.style.pointerEvents='';}
+      if(lbl)lbl.style.display='';
+      if(btn)btn.style.display='none';
+    });
+  }
   var mfcb=document.getElementById('mFotoChangBtn');
   if(mfcb)mfcb.addEventListener('click',function(e){
     e.stopPropagation();
@@ -1507,13 +1519,11 @@ function boot(){
     // We'll re-add has-foto when file is selected
     if(mff)mff.click();
   });
-  // Modal foto area click → lightbox or file picker
-  var _mfa=qs('mFotoArea'),_mff=qs('mFotoFile');
-  if(_mfa)_mfa.addEventListener('click',function(){
-    if(this.classList.contains('has-foto')){
-      var _fp=qs('mFotoPreview');
-      if(_fp&&_fp.src&&_fp.src!==window.location.href)openLightbox(_fp.src);
-    }
+  // mFotoArea: label handles file picker natively; lightbox via preview click
+  var _mfp3=qs('mFotoPreview');
+  if(_mfp3)_mfp3.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    if(this.src&&this.src!==window.location.href)openLightbox(this.src);
   });
   // Cucina mode buttons
   var _cc=qs('cucinaClose');if(_cc)_cc.addEventListener('click',closeCucina);
