@@ -39,8 +39,10 @@ git push
 
 ```
 panificazione/
-├── index.html      ← app completa (self-contained)
-├── vercel.json     ← config deploy Vercel
+├── index.html          ← app completa (ricette, Studio AI, biblioteca)
+├── api/import.js       ← funzione Vercel: AI lato server e lettura pagine per l'import da link
+├── icons/, manifest.webmanifest ← icone e installazione come app
+├── vercel.json         ← config deploy Vercel
 ├── .gitignore
 └── README.md
 ```
@@ -54,3 +56,11 @@ panificazione/
 | `--gold2` | `#A8722A` | Miele dorato |
 | `--terra` | `#8C4A2F` | Argilla forno |
 | `--ink` | `#1A1410` | Testo profondo |
+
+## Variabili su Vercel (facoltative)
+
+- `GROQ_API_KEY`: chiave Groq usata dal server per lo Studio AI. Senza, l'app usa la chiave salvata sul dispositivo.
+
+## Regole Firebase
+
+L'app legge e scrive in `/ricette`, `/config` (chiave AI condivisa) e `/biblioteca` (scaffale, progressi, segnalibri).
