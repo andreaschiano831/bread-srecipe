@@ -1,5 +1,4 @@
-// Inserimento ricette con AI dal server:
-// POST /api/import  { url }   -> { html }   (pagina scaricata dal server per l'import da link)
+// Inserimento ricette con AI dal server (come in ANDRE-S-RECIPE):
 // la chiave Groq resta su Vercel (variabile GROQ_API_KEY).
 // GET  /api/import            -> { ok, configured }
 // POST /api/import  { image } -> { recipes, source }   (una foto, data URL jpeg/png/webp)
@@ -14,7 +13,7 @@
 /* ===== CORE-START ===== */
 var AI_VISION = ['qwen/qwen3.8-27b', 'meta-models/muse-spark-open', 'meta-llama/llama-4-scout-17b-16e-instruct'];
 var AI_TEXT = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b'];
-var AI_SECTIONS = { colazioni: 'Colazioni', 'fine-dining': 'Fine Dining', gelateria: 'Gelateria', torte: 'Torte', panificazione: 'Panificazione' };
+var AI_SECTIONS = { colazioni: 'Colazioni', 'fine-dining': 'Fine Dining', panificazione: 'Panificazione' };
 var AI_CATEGORIES = ['Pane', 'Pizza & Focaccia', 'Creme', 'Paste', 'Torte', 'Lievitati', 'Pasticcini', 'Marmellate', 'Ganache', 'Mousse', 'Gelatine', 'Gelati', 'Sorbetti', 'Semifreddi', 'Granite', 'Basi', 'Glasse', 'Biscotti', 'Altro'];
 
 var AI_OCR_PROMPT = 'Sei un sistema OCR di precisione. Trascrivi ESATTAMENTE tutto il testo visibile nell\'immagine, riga per riga, nello stesso ordine.\n' +
@@ -59,8 +58,6 @@ function aiSectionKey(name) {
   if (!n) return '';
   for (k in AI_SECTIONS) if (k === n || AI_SECTIONS[k].toLowerCase() === n) return k;
   for (k in AI_SECTIONS) { var v = AI_SECTIONS[k].toLowerCase(); if (n.indexOf(v) > -1 || v.indexOf(n) > -1) return k; }
-  if (/gelat|sorbett|semifredd|granit/.test(n)) return 'gelateria';
-  if (/torta|torte|crostat/.test(n)) return 'torte';
   if (/panific|pane\b|pizza|focacc|baguette|ciabatt|panin/.test(n)) return 'panificazione';
   if (/dining|piatto/.test(n)) return 'fine-dining';
   if (/colazion|monoporz|lievitat|viennois/.test(n)) return 'colazioni';
@@ -178,6 +175,10 @@ async function aiGroqChat(url, key, kind, system, user, image, json) {
   }
   return { error: 'Nessun modello AI disponibile su Groq (' + last + ')', _status: 502 };
 }
+function aiTranslatePrompt(lang) {
+  return 'Sei un traduttore specializzato in cucina, panificazione e pasticceria professionale. Traduci in ' + lang + ' il testo che ricevi, in modo fedele e naturale, con la terminologia di laboratorio (es. "blind bake" = "cuocere in bianco", "egg wash" = "doratura", "sweet dough" = "pasta frolla", "half-dome molds" = "stampi a semisfera"). ' +
+    'Mantieni ESATTAMENTE numeri, quantità, unità e temperature come scritti (non convertire), e la struttura: titoli, elenchi, a capo. Se una parola è illeggibile ([?]) lasciala così. Non aggiungere commenti, note o spiegazioni: rispondi solo con la traduzione.';
+}
 /* ===== CORE-END ===== */
 
 const GROQ_URL = process.env.GROQ_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
@@ -235,6 +236,12 @@ module.exports = async function handler(req, res) {
     const o = await aiOcrOnly(chat, String(body.image));
     if (o.error) return res.status(o._status && o._status >= 400 ? o._status : 502).json({ error: o.error });
     return res.status(200).json(o);
+  }
+  if (body.translate) {
+    const lang = { it: 'italiano', en: 'inglese', fr: 'francese', es: 'spagnolo', de: 'tedesco' }[body.lang] || 'italiano';
+    const r = await aiGroqChat(GROQ_URL, key, 'text', aiTranslatePrompt(lang), String(body.translate).slice(0, 9000), null, false);
+    if (r.error) return res.status(r._status && r._status >= 400 ? r._status : 502).json({ error: r.error });
+    return res.status(200).json({ text: r.text });
   }
   if (body.advice) {
     const sys = 'Sei un pastry chef consulente di alto livello. Ricevi una ricetta con calcoli di composizione stimati. Rispondi in italiano con 3-6 consigli pratici e brevi per migliorarla o bilanciarla (zuccheri, grassi, solidi, struttura, dolcezza; per gelati e sorbetti anche POD/PAC e servizio). Per ogni correzione indica la quantità in grammi. Usa solo i dati forniti, non inventare ingredienti che non servono; se i dati non bastano dillo. Niente premesse, solo elenco puntato.';
