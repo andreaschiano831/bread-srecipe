@@ -5645,7 +5645,7 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
       if(/^covers\//.test(p))return fbLib('covers/'+fk(p)).then(function(d){if(!d)throw new Error('Copertina non trovata');return fetch(d).then(function(r){return r.blob();});}).then(function(b){idbPut(p,b);return b;});
       var m=null;try{m=document.querySelector('.rd-msg');}catch(e){}
       return cloudGet(p,function(i,n){try{var el=document.querySelector('.rd-msg');if(el&&n>1)el.textContent='Scarico il libro… '+Math.round(i/n*100)+'%';}catch(e){}}).then(function(blob){
-        if(!blob)throw new Error('Il file non è ancora nel database: aprilo una volta sul dispositivo dove l’hai caricato (si copia da solo) oppure ricaricalo qui');
+        if(!blob)throw new Error('Il file di questo libro non è ancora nel database. Ricaricalo qui sotto: da quel momento si apre su tutti i dispositivi.');
         idbPut(p,blob);return blob;
       });
     });
@@ -5743,10 +5743,10 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
     var file=h('input');file.type='file';file.accept='.epub,.pdf,application/epub+zip,application/pdf';file.multiple=true;file.hidden=true;
     file.onchange=function(){if(file.files&&file.files.length)uploadFiles(Array.from(file.files));file.value='';};
     wrap.appendChild(file);
-    if(LIB.setup!==false&&isAdmin){
+    if(LIB.setup!==false){
       var up=h('button','lib-btn lib-btn-dark',ICON.up+'<span>Carica ebook</span>');up.type='button';up.id='libUploadBtn';
       if(LIB.busy){up.disabled=true;up.innerHTML='<span class="lib-spin"></span><span>'+LIB.busy+'</span>';}
-      up.onclick=function(){file.click();};wrap.appendChild(up);
+      up.onclick=function(){try{checkAdmin();}catch(e){}if(!isAdmin&&typeof adminGate==='function'){adminGate(function(){file.click();},'Per caricare un libro serve il PIN admin.');return;}file.click();};wrap.appendChild(up);
     }
     var search=h('div','lib-search'+(LIB.q?' on':''));var si=h('input');si.placeholder='Cerca per titolo o autore';si.value=LIB.q;
     si.oninput=function(){LIB.q=si.value;renderGrid(grid);};search.appendChild(si);wrap.appendChild(search);
@@ -5865,11 +5865,27 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
     download(b.file_path).then(function(blob){
       if(!R||R.book!==b)return;
       return (b.kind==='epub'?epubView:pdfView)(stage,blob);
-    }).catch(function(e){var m=rd.querySelector('.rd-msg');if(m)m.textContent=e.message||String(e);});
+    }).catch(function(e){var m=rd.querySelector('.rd-msg');if(m)reloadOffer(m,b,stage,e);});
     rest('library_marks?book_id=eq.'+b.id+'&order=created_at.asc').then(function(m){if(R&&R.book===b){R.marks=m||[];if(R.api)R.api.setMarks(R.marks);updateBookmark();}}).catch(function(){});
     document.addEventListener('keydown',keyH);
   }
   window.libOpenReader=openReader;
+  // il file del libro manca: lo si sceglie di nuovo dal telefono e va nel database per tutti i dispositivi
+  function reloadOffer(m,b,stage,e){
+    m.innerHTML='';m.appendChild(txt('p','',(e&&e.message)||String(e)));
+    var lab=h('label','lib-btn lib-btn-dark',ICON.up+'<span>Ricarica il file</span>');lab.style.cssText='display:inline-flex;margin-top:1rem;cursor:pointer;position:relative;font-style:normal';
+    var inp=h('input');inp.type='file';inp.accept=b.kind==='pdf'?'.pdf,application/pdf':'.epub,application/epub+zip';inp.style.cssText='position:absolute;width:1px;height:1px;opacity:0;left:0;top:0;pointer-events:none';
+    lab.appendChild(inp);m.appendChild(lab);
+    inp.onchange=function(){
+      var f=inp.files&&inp.files[0];inp.value='';if(!f)return;
+      if(b.kind==='pdf'?!/\.pdf$/i.test(f.name):!/\.epub$/i.test(f.name)){toast('Scegli il file '+(b.kind==='pdf'?'.pdf':'.epub')+' di questo libro','err');return;}
+      m.innerHTML='';m.textContent='Carico il libro nel database\u2026';
+      upload(b.file_path,f,b.kind==='pdf'?'application/pdf':'application/epub+zip').then(function(){
+        if(!R||R.book!==b)return;m.textContent='Apro il libro\u2026';
+        return (b.kind==='epub'?epubView:pdfView)(stage,f);
+      }).then(function(){toast('Libro disponibile su tutti i dispositivi','ok');}).catch(function(er){reloadOffer(m,b,stage,er);});
+    };
+  }
   function closeReader(){
     if(!R)return;flushSave();
     try{R.api&&R.api.destroy&&R.api.destroy();}catch(e){}
