@@ -63,4 +63,4 @@ panificazione/
 
 ## Regole Firebase
 
-L'app legge e scrive in `/ricette`, `/config` (chiave AI condivisa) e `/biblioteca` (scaffale, progressi, segnalibri).
+L'app legge e scrive in `/ricette`, `/config` (chiave AI condivisa) e `/biblioteca` (scaffale, progressi, segnalibri e file degli ebook a pezzi).

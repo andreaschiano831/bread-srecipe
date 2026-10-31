@@ -5466,7 +5466,7 @@ function aiShowCheck(warns,source){
    BIBLIOTECA — ebook EPUB e PDF (come in ANDRE-S-RECIPE)
    Scaffale, continua a leggere, lettore con indice, ricerca,
    segnalibri, evidenziazioni, note, temi; posizione sincronizzata.
-   Scaffale e progressi su Firebase, file degli ebook sul dispositivo.
+   Scaffale, progressi e file degli ebook su Firebase (a pezzi), copia sul dispositivo.
    ════════════════════════════════════════════════════════════════ */
 
 /* sfoglia trascinando: la pagina segue il dito (o il mouse) e gira oltre una soglia */
@@ -5601,20 +5601,56 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
   }
   function storageUrl(p){return '';}
   function blobToDataUrl(b){return new Promise(function(res){var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=function(){res(null);};fr.readAsDataURL(b);});}
+  /* file degli ebook su Firebase, a pezzi da 512 KB: si aprono da qualsiasi dispositivo */
+  var CH=524288;
+  function b64(blob){return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var s=String(fr.result);res(s.slice(s.indexOf(',')+1));};fr.onerror=function(){rej(fr.error||new Error('Lettura del file non riuscita'));};fr.readAsDataURL(blob);});}
+  function unb64(s){var bin=atob(s),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;}
+  function cloudPut(p,blob,type,onProg){
+    var k=fk(p),n=Math.max(1,Math.ceil(blob.size/CH)),i=0;
+    function next(){
+      if(i>=n)return fbLib('files_meta/'+k,'PUT',{n:n,type:type||blob.type||'',size:blob.size,at:new Date().toISOString()});
+      var part=blob.slice(i*CH,Math.min(blob.size,(i+1)*CH));
+      return b64(part).then(function(s){return fbLib('files/'+k+'/'+i,'PUT',s);}).then(function(){i++;if(onProg)onProg(i,n);return next();});
+    }
+    return next();
+  }
+  function cloudGet(p,onProg){
+    var k=fk(p);
+    return fbLib('files_meta/'+k).then(function(m){
+      if(!m||!m.n)return null;
+      var parts=new Array(m.n),done=0,idx=0;
+      function worker(){if(idx>=m.n)return Promise.resolve();var j=idx++;
+        return fbLib('files/'+k+'/'+j).then(function(s){if(typeof s!=='string')throw new Error('File incompleto nel database: ricaricalo');parts[j]=unb64(s);done++;if(onProg)onProg(done,m.n);return worker();});}
+      return Promise.all([worker(),worker(),worker()]).then(function(){return new Blob(parts,{type:m.type||''});});
+    });
+  }
+  var _syncing={};
+  function ensureCloud(p,blob){
+    if(_syncing[p]||/^covers\//.test(p))return;_syncing[p]=1;
+    fbLib('files_meta/'+fk(p)).then(function(m){if(m&&m.n)return;
+      toast('Copio il libro nel database per gli altri dispositivi…');
+      return cloudPut(p,blob,blob.type).then(function(){toast('Libro disponibile su tutti i dispositivi','ok');});
+    }).catch(function(){}).then(function(){delete _syncing[p];});
+  }
   function upload(p,blob,type){
     return idbPut(p,blob).then(function(){
-      // le copertine (piccole) vanno anche su Firebase, così lo scaffale si vede su tutti i dispositivi
-      if(/^covers\//.test(p)&&blob&&blob.size<450000)return blobToDataUrl(blob).then(function(d){if(d)return fbLib('covers/'+fk(p),'PUT',d).catch(function(){});});
+      // le copertine (piccole) vanno su Firebase come immagine
+      if(/^covers\//.test(p)){if(blob&&blob.size<450000)return blobToDataUrl(blob).then(function(d){if(d)return fbLib('covers/'+fk(p),'PUT',d).catch(function(){});});return;}
+      return cloudPut(p,blob,type,function(i,n){if(n>1){LIB.busy='Carico nel database… '+Math.round(i/n*100)+'%';try{var u=document.getElementById('libUploadBtn');if(u)u.innerHTML='<span class="lib-spin"></span><span>'+LIB.busy+'</span>';}catch(e){}}});
     });
   }
   function download(p){
     return idbGet(p).then(function(b){
-      if(b)return b;
+      if(b){ensureCloud(p,b);return b;}
       if(/^covers\//.test(p))return fbLib('covers/'+fk(p)).then(function(d){if(!d)throw new Error('Copertina non trovata');return fetch(d).then(function(r){return r.blob();});}).then(function(b){idbPut(p,b);return b;});
-      throw new Error('Il file di questo libro è salvato su un altro dispositivo: ricaricalo qui da «Carica»');
+      var m=null;try{m=document.querySelector('.rd-msg');}catch(e){}
+      return cloudGet(p,function(i,n){try{var el=document.querySelector('.rd-msg');if(el&&n>1)el.textContent='Scarico il libro… '+Math.round(i/n*100)+'%';}catch(e){}}).then(function(blob){
+        if(!blob)throw new Error('Il file non è ancora nel database: aprilo una volta sul dispositivo dove l’hai caricato (si copia da solo) oppure ricaricalo qui');
+        idbPut(p,blob);return blob;
+      });
     });
   }
-  function removeFiles(paths){(paths||[]).forEach(function(p){idbDel(p);if(/^covers\//.test(p))fbLib('covers/'+fk(p),'DELETE').catch(function(){});});return Promise.resolve();}
+  function removeFiles(paths){(paths||[]).forEach(function(p){idbDel(p);if(/^covers\//.test(p))fbLib('covers/'+fk(p),'DELETE').catch(function(){});else{fbLib('files/'+fk(p),'DELETE').catch(function(){});fbLib('files_meta/'+fk(p),'DELETE').catch(function(){});}});return Promise.resolve();}
   window.libRest=rest;
 
   function isSetupErr(e){return e&&(e.status===404||e.code==='PGRST205'||e.code==='42P01'||/does not exist|could not find the table|schema cache/i.test(e.message||''));}
@@ -5702,7 +5738,7 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
     var sbtn=h('button','lib-icon-btn',ICON.search);sbtn.type='button';sbtn.setAttribute('aria-label','Cerca');
     sbtn.onclick=function(){var s=v.querySelector('.lib-search');if(s){s.classList.toggle('on');var i=s.querySelector('input');if(i&&s.classList.contains('on'))i.focus();}};
     hd.appendChild(sbtn);wrap.appendChild(hd);
-    wrap.appendChild(txt('p','lib-lead','I tuoi ricettari in EPUB e PDF, da sfogliare con segnalibri, evidenziazioni e note. Riprendi dove eri arrivato: il punto di lettura si sincronizza.'));
+    wrap.appendChild(txt('p','lib-lead','I tuoi ricettari in EPUB e PDF, da sfogliare con segnalibri, evidenziazioni e note. Riprendi dove eri arrivato, anche da un altro dispositivo.'));
 
     var file=h('input');file.type='file';file.accept='.epub,.pdf,application/epub+zip,application/pdf';file.multiple=true;file.hidden=true;
     file.onchange=function(){if(file.files&&file.files.length)uploadFiles(Array.from(file.files));file.value='';};
@@ -5747,7 +5783,7 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
       grid.className='';var e=h('div','lib-empty');
       e.innerHTML=ICON.book.replace('width="18" height="18"','width="34" height="34"');
       e.appendChild(txt('b','lib-empty-t','La biblioteca \u00e8 vuota'));
-      e.appendChild(txt('p','','Carica i ricettari che hai in EPUB o PDF (fino a 50 MB l\u2019uno). Il file resta su questo dispositivo; scaffale, segnalibri, note e punto di lettura si sincronizzano.'));
+      e.appendChild(txt('p','','Carica i ricettari che hai in EPUB o PDF (fino a 50 MB l\u2019uno). Restano nel database del Ricettario e li apri da qualsiasi dispositivo.'));
       grid.appendChild(e);return;
     }
     grid.className='lib-grid';
@@ -5799,7 +5835,7 @@ var LIB={books:[],progress:{},setup:null,covers:{},loaded:false,q:''};
           return rest('library_books',{method:'POST',headers:{Prefer:'return=representation'},body:{id:id,title:m.title.slice(0,200),author:m.author?String(m.author).slice(0,200):null,kind:m.kind,file_path:path,cover_path:cover_path,size_bytes:f.size,pages:m.pages}});
         }).then(function(rows){if(rows&&rows[0])LIB.books.unshift(rows[0]);ok++;});
       }).catch(function(e){
-        toast(f.name+': '+(/bucket|not found/i.test(e.message)?'manca l\u2019archivio \u00ablibrary\u00bb su Supabase (esegui il codice SQL)':e.message),'err');
+        toast(f.name+': '+(/bucket|not found/i.test(e.message)?'il database non accetta il file: controlla le regole Firebase su /biblioteca':e.message),'err');
       }).then(next);
     }
     next();
